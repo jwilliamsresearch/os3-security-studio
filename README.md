@@ -5,9 +5,9 @@
 <!-- Logo placeholder - replace with actual logo when ready -->
 <img src="https://jwilliams.science/os3-security-studio/assets/images/os3-logo.png" alt="OS³ Logo" width="200" height="200" />
 
-**Comprehensive Educational Cybersecurity Platform**
+**Comprehensive Educational Cyber Security Platform**
 
-*Empowering the next generation of cybersecurity professionals through hands-on, practical education*
+*Empowering the next generation of cyber security professionals through hands-on, practical education*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
