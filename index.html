@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS³: Open Source Security Studio - Educational Cyber Security Platform</title>
+    <meta name="description" content="OS³ is a comprehensive educational cyber security platform for learning ethical hacking, vulnerability assessment, and defensive security practices.">
+    <meta name="keywords" content="cyber security, education, ethical hacking, penetration testing, security training, open source">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jwilliamsresearch.github.io/os3-security-studio/">
+    <meta property="og:title" content="OS³: Open Source Security Studio">
+    <meta property="og:description" content="Comprehensive educational cyber security platform for learning ethical hacking and security practices.">
+    <meta property="og:image" content="./assets/images/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://jwilliamsresearch.github.io/os3-security-studio/">
+    <meta property="twitter:title" content="OS³: Open Source Security Studio">
+    <meta property="twitter:description" content="Comprehensive educational cyber security platform for learning ethical hacking and security practices.">
+    <meta property="twitter:image" content="./assets/images/og-image.png">
+
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="./assets/images/os3-logo.png" alt="OS³ Logo" class="logo">
+                <span class="logo-text">OS³</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#features" class="nav-link">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#modules" class="nav-link">Modules</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#installation" class="nav-link">Get Started</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#documentation" class="nav-link">Documentation</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio" class="nav-link github-link" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Educational Cyber Security Platform</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">Open Source Security Studio</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Master cyber security through hands-on learning with OS³ – a comprehensive educational platform 
+                    featuring interactive labs, vulnerability assessments, and defensive security training.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Get Started
+                    </a>
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio" class="btn btn-secondary" target="_blank">
+                        <i class="fab fa-github"></i>
+                        View on GitHub
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">15+</span>
+                        <span class="stat-label">Security Modules</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Interactive Labs</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Open Source</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="btn-close"></span>
+                            <span class="btn-minimize"></span>
+                            <span class="btn-maximize"></span>
+                        </div>
+                        <span class="terminal-title">OS³ Security Lab</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="prompt">os3@security-lab:~$</span>
+                            <span class="command">python app.py</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output success">✓ OS³ Security Studio Initialized</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">🔒 Loading Security Modules...</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">🛡️  Port Scanner Module: Active</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">🔍 Vulnerability Scanner: Ready</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">🌐 Network Analysis: Online</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output success">🚀 Server running at http://localhost:5000</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="prompt">os3@security-lab:~$</span>
+                            <span class="cursor">█</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose OS³?</h2>
+                <p class="section-subtitle">
+                    Built for educators, students, and security professionals who want hands-on cyber security experience
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Educational Focus</h3>
+                    <p>Designed specifically for learning with guided tutorials, explanations, and real-world scenarios.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Safe Environment</h3>
+                    <p>Practise ethical hacking techniques in a controlled, isolated environment without real network risks.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Open Source</h3>
+                    <p>Software licenced under MIT, educational content under CC BY 4.0 – customise, extend, and contribute to the platform.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Modular Design</h3>
+                    <p>Extensible architecture allows easy addition of new security modules and training scenarios.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>Interactive Labs</h3>
+                    <p>Hands-on exercises with real-time feedback and step-by-step guidance through security concepts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor learning progress with detailed analytics and performance metrics across all modules.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section id="modules" class="modules">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Security Modules</h2>
+                <p class="section-subtitle">
+                    Comprehensive coverage of cyber security domains with practical, hands-on exercises
+                </p>
+            </div>
+            <div class="modules-grid">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h3>Network Security</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Learn network reconnaissance, port scanning, and traffic analysis techniques.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> Port Scanner with Stealth Techniques</li>
+                            <li><i class="fas fa-check"></i> Network Traffic Analysis</li>
+                            <li><i class="fas fa-check"></i> Intrusion Detection</li>
+                            <li><i class="fas fa-check"></i> Network Monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Beginner to Advanced</span>
+                    </div>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <h3>Vulnerability Assessment</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Discover and analyse security vulnerabilities in web applications and systems.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> SQL Injection Detection</li>
+                            <li><i class="fas fa-check"></i> XSS Vulnerability Testing</li>
+                            <li><i class="fas fa-check"></i> CSRF Protection Analysis</li>
+                            <li><i class="fas fa-check"></i> Security Misconfiguration</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Intermediate</span>
+                    </div>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h3>Cryptography</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Understand encryption, hashing, and cryptographic protocols through practical examples.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> Encryption/Decryption Labs</li>
+                            <li><i class="fas fa-check"></i> Hash Function Analysis</li>
+                            <li><i class="fas fa-check"></i> Digital Signatures</li>
+                            <li><i class="fas fa-check"></i> PKI Implementation</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Advanced</span>
+                    </div>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>Access Control</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Explore authentication, authorisation, and access control mechanisms.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> Authentication Bypass</li>
+                            <li><i class="fas fa-check"></i> Privilege Escalation</li>
+                            <li><i class="fas fa-check"></i> Session Management</li>
+                            <li><i class="fas fa-check"></i> Multi-Factor Authentication</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Intermediate</span>
+                    </div>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3>File Upload Security</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Learn about file upload vulnerabilities and secure file handling practices.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> Malicious File Detection</li>
+                            <li><i class="fas fa-check"></i> File Type Validation</li>
+                            <li><i class="fas fa-check"></i> Path Traversal Prevention</li>
+                            <li><i class="fas fa-check"></i> Secure File Storage</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Beginner</span>
+                    </div>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>Security Monitoring</h3>
+                    </div>
+                    <div class="module-content">
+                        <p>Implement security logging, monitoring, and incident response procedures.</p>
+                        <ul class="module-features">
+                            <li><i class="fas fa-check"></i> Log Analysis</li>
+                            <li><i class="fas fa-check"></i> Anomaly Detection</li>
+                            <li><i class="fas fa-check"></i> SIEM Integration</li>
+                            <li><i class="fas fa-check"></i> Incident Response</li>
+                        </ul>
+                    </div>
+                    <div class="module-footer">
+                        <span class="module-level">Advanced</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Quick Start</h2>
+                <p class="section-subtitle">
+                    Get OS³ running in minutes with our simple installation process
+                </p>
+            </div>
+            <div class="installation-content">
+                <div class="installation-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Clone Repository</h3>
+                            <p>Download the OS³ toolkit from GitHub</p>
+                            <div class="code-block">
+                                <code>git clone https://github.com/jwilliamsresearch/os3-security-studio.git</code>
+                                <button class="copy-btn" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Install Dependencies</h3>
+                            <p>Set up the Python environment and required packages</p>
+                            <div class="code-block">
+                                <code>cd newmanCyberLab && pip install -r requirements.txt</code>
+                                <button class="copy-btn" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Launch Application</h3>
+                            <p>Start the OS³ security lab environment</p>
+                            <div class="code-block">
+                                <code>python app.py</code>
+                                <button class="copy-btn" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Access Lab</h3>
+                            <p>Open your browser and start learning!</p>
+                            <div class="code-block">
+                                <code>http://localhost:5000</code>
+                                <button class="copy-btn" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="installation-requirements">
+                    <h3>System Requirements</h3>
+                    <div class="requirements-grid">
+                        <div class="requirement">
+                            <i class="fab fa-python"></i>
+                            <span>Python 3.8+</span>
+                        </div>
+                        <div class="requirement">
+                            <i class="fas fa-memory"></i>
+                            <span>4GB RAM</span>
+                        </div>
+                        <div class="requirement">
+                            <i class="fas fa-hdd"></i>
+                            <span>2GB Storage</span>
+                        </div>
+                        <div class="requirement">
+                            <i class="fas fa-globe"></i>
+                            <span>Web Browser</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="documentation" class="documentation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Documentation & Resources</h2>
+                <p class="section-subtitle">
+                    Everything you need to get the most out of OS³
+                </p>
+            </div>
+            <div class="docs-grid">
+                <div class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>User Guide</h3>
+                    <p>Comprehensive documentation covering all features and modules</p>
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio/blob/main/README.md" class="doc-link">Read Guide <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Learning Documentation</h3>
+                    <p>In-depth tutorials and educational materials for cyber security learning</p>
+                    <a href="./documentation/" class="doc-link">Coming Soon <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Video Tutorials</h3>
+                    <p>Step-by-step video guides for all security modules</p>
+                    <a href="#" class="doc-link">Watch Videos <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community</h3>
+                    <p>Join discussions, get help, and share your experiences</p>
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio/discussions" class="doc-link">Join Community <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Master Cyber Security?</h2>
+                <p>Join current students in learning cyber security through hands-on practice</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-github"></i>
+                        Get Started on GitHub
+                    </a>
+                    <a href="https://github.com/jwilliamsresearch/os3-security-studio/releases" class="btn btn-secondary" target="_blank">
+                        <i class="fas fa-download"></i>
+                        Download Latest Release
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="./assets/images/os3-logo.png" alt="OS³ Logo" class="logo">
+                        <span class="logo-text">OS³</span>
+                    </div>
+                    <p>Open Source Security Studio – Educational cyber security platform for hands-on learning.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/jwilliamsresearch/os3-security-studio" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" target="_blank">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Platform</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#modules">Security Modules</a></li>
+                        <li><a href="#installation">Quick Start</a></li>
+                        <li><a href="#documentation">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/blob/main/README.md">User Guide</a></li>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/wiki">API Reference</a></li>
+                        <li><a href="#">Video Tutorials</a></li>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/discussions">Community Forum</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/issues">Report Issues</a></li>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/issues/new?template=feature_request.md">Feature Requests</a></li>
+                        <li><a href="https://github.com/jwilliamsresearch/os3-security-studio/blob/main/CONTRIBUTING.md">Contributing Guide</a></li>
+                        <li><a href="mailto:contact@os3-security.org">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+                <div class="footer-bottom">
+                <p>&copy; 2025 OS³ (Open Source Security Studio) by James Williams. Software licenced under <a href="https://opensource.org/licenses/MIT" target="_blank">MIT</a>, content under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./assets/js/main.js"></script>
+</body>
+</html>
