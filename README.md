@@ -178,12 +178,7 @@ We welcome contributions from the cybersecurity and education communities!
 - **Remember**: Practice responsible disclosure and ethical security practices
 
 ### **Production Deployment Warning**
-Never deploy this application in production without:
-- Removing all intentional vulnerabilities
-- Implementing comprehensive input validation
-- Adding proper authentication and authorisation
-- Enabling security monitoring and logging
-- Following industry security best practices
+Never deploy this application in production.
 
 ---
 
