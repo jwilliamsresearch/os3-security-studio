@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insecure Design (CSRF) Module | OS3: Open Source Security Studio</title>
+  <meta name="description" content="Demonstrates CSRF attacks and effective mitigations including anti-CSRF tokens, SameSite cookies, and safe design patterns.">
+  <meta name="keywords" content="csrf, cross-site request forgery, insecure design, samesite, csrf token, web security, os3">
+  <link rel="canonical" href="https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html">
+  <meta property="og:title" content="Insecure Design (CSRF) Module | OS3">
+  <meta property="og:description" content="CSRF attacks and mitigations: tokens, SameSite, and safe design.">
+  <meta property="og:image" content="https://jwilliams.science/os3-security-studio/assets/images/os3-logo.png">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html">
+  <meta property="twitter:title" content="Insecure Design (CSRF) Module | OS3">
+  <meta property="twitter:description" content="CSRF attacks and mitigations: tokens, SameSite, and safe design.">
+  <meta property="twitter:image" content="https://jwilliams.science/os3-security-studio/assets/images/os3-logo.png">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="icon" type="image/x-icon" href="../assets/images/os3-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Insecure Design (CSRF)",
+    "description": "Demonstrates CSRF attacks and effective mitigations including anti-CSRF tokens, SameSite cookies, and safe design patterns.",
+    "provider": {"@type": "EducationalOrganization", "name": "OS3: Open Source Security Studio", "url": "https://jwilliams.science/os3-security-studio/"},
+    "courseCode": "WEB-CSRF-01",
+    "learningResourceType": "Hands-on Lab",
+    "educationalLevel": "Intermediate",
+    "url": "https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"Home","item":"https://jwilliams.science/os3-security-studio/"},
+      {"@type":"ListItem","position":2,"name":"Modules","item":"https://jwilliams.science/os3-security-studio/modules/"},
+      {"@type":"ListItem","position":3,"name":"Insecure Design (CSRF)","item":"https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html"}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo"><img src="../assets/images/os3-logo.png" alt="OS3 Logo" class="logo"><span class="logo-text">OS3</span></div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="../index.html#features" class="nav-link">Features</a></li>
+        <li class="nav-item"><a href="./" class="nav-link">Modules</a></li>
+        <li class="nav-item"><a href="../index.html#installation" class="nav-link">Get Started</a></li>
+        <li class="nav-item"><a href="../index.html#documentation" class="nav-link">Documentation</a></li>
+        <li class="nav-item"><a href="https://github.com/jwilliamsresearch/os3-security-studio" class="nav-link github-link" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+      </ul>
+      <div class="hamburger"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge"><i class="fas fa-globe"></i><span>Web Security</span></div>
+        <h1 class="hero-title"><span class="gradient-text">Insecure Design (CSRF)</span></h1>
+        <p class="hero-subtitle">Risk: Flaws in design and architecture lead to security weaknesses. Demonstrated through CSRF attacks showing poor design decisions.</p>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-number">WEB-CSRF-01</span><span class="stat-label">Module ID</span></div>
+          <div class="stat"><span class="stat-number">Hands-on</span><span class="stat-label">Lab Type</span></div>
+          <div class="stat"><span class="stat-number">Intermediate</span><span class="stat-label">Level</span></div>
+        </div>
+        <div class="hero-buttons"><a href="../index.html#installation" class="btn btn-primary"><i class="fas fa-rocket"></i> Start Learning</a><a href="./" class="btn btn-secondary"><i class="fas fa-list"></i> All Modules</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <nav aria-label="Breadcrumb" style="margin-bottom:1rem;color:#6b7280;font-size:0.9rem;"><a href="../index.html">Home</a> &raquo; <a href="./">Modules</a> &raquo; Insecure Design (CSRF)</nav>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-circle-info"></i></div><h3>Overview</h3><p>See how missing anti-CSRF protections and unsafe designs allow attackers to trigger unauthorized state changes.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Learning Outcomes</h3>
+          <ul class="module-features">
+            <li><i class="fas fa-check"></i> Understand CSRF mechanics and preconditions</li>
+            <li><i class="fas fa-check"></i> Implement anti-CSRF tokens and double-submit</li>
+            <li><i class="fas fa-check"></i> Configure SameSite and secure cookies</li>
+            <li><i class="fas fa-check"></i> Favor idempotent and confirmatory flows</li>
+            <li><i class="fas fa-check"></i> Validate protections via automated tests</li>
+          </ul>
+        </div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-flask"></i></div><h3>Hands-on Labs</h3><p>Exploit a CSRF weakness, then iteratively apply and verify multiple defenses.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>Design</h3><p>Use defense-in-depth: tokens, SameSite, re-auth for risky changes, and user intent verification.</p></div>
+      </div>
+      <div class="cta" style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;"><a class="btn btn-primary" href="../index.html#installation"><i class="fas fa-rocket"></i> Launch OS3 Locally</a><a class="btn btn-secondary" href="https://github.com/jwilliamsresearch/os3-security-studio" target="_blank"><i class="fab fa-github"></i> View on GitHub</a></div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><div class="footer-logo"><img src="../assets/images/os3-logo.png" alt="OS3 Logo" class="logo"><span class="logo-text">OS3</span></div><p>Open Source Security Studio – Educational cyber security platform for hands-on learning.</p><div class="social-links"><a href="https://github.com/jwilliamsresearch/os3-security-studio" target="_blank"><i class="fab fa-github"></i></a><a href="#" target="_blank"><i class="fab fa-twitter"></i></a><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></div></div><div class="footer-section"><h3>Platform</h3><ul><li><a href="../index.html#features">Features</a></li><li><a href="./">Security Modules</a></li><li><a href="../index.html#installation">Quick Start</a></li><li><a href="../index.html#documentation">Documentation</a></li></ul></div><div class="footer-section"><h3>Resources</h3><ul><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/blob/main/README.md">User Guide</a></li><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/wiki">API Reference</a></li><li><a href="#">Video Tutorials</a></li><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/discussions">Community Forum</a></li></ul></div><div class="footer-section"><h3>Support</h3><ul><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/issues">Report Issues</a></li><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/issues/new?template=feature_request.md">Feature Requests</a></li><li><a href="https://github.com/jwilliamsresearch/os3-security-studio/blob/main/CONTRIBUTING.md">Contributing Guide</a></li><li><a href="mailto:contact@os3-security.org">Contact</a></li></ul></div></div><div class="footer-bottom"><p>&copy; 2025 OS3 (Open Source Security Studio) by James Williams. Software MIT, content CC BY 4.0.</p></div></div></footer>
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
+

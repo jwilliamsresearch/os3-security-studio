@@ -10,8 +10,8 @@
 # Site settings
 title: "OS³: Open Source Security Studio"
 description: "Educational cybersecurity platform for hands-on learning"
-url: "https://jwilliamsresearch.github.io"
-baseurl: "/newmanCyberLab/os3-website"  # Adjust based on your repository structure
+url: "https://jwilliams.science"
+baseurl: "/os3-security-studio"  # Adjust based on your repository structure
 
 # Build settings
 markdown: kramdown

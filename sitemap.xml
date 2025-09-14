@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://jwilliams.science/os3-security-studio/</loc>
+    <lastmod>2025-09-14</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://jwilliams.science/os3-security-studio/index.html</loc>
+    <lastmod>2025-09-14</lastmod>
+    <priority>0.99</priority>
+  </url>
+  <url>
+    <loc>https://jwilliams.science/os3-security-studio/modules/</loc>
+    <lastmod>2025-09-14</lastmod>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://jwilliams.science/os3-security-studio/documentation/</loc>
+    <lastmod>2025-09-14</lastmod>
+    <priority>0.60</priority>
+  </url>
+  <url>
+    <loc>https://jwilliams.science/os3-security-studio/documentation/index.html</loc>
+    <lastmod>2025-09-14</lastmod>
+    <priority>0.59</priority>
+  </url>
+
+  <!-- Network Security Modules -->
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/http-vs-https.html</loc><lastmod>2025-09-14</lastmod><priority>0.85</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/port-scanning.html</loc><lastmod>2025-09-14</lastmod><priority>0.85</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/dns-security.html</loc><lastmod>2025-09-14</lastmod><priority>0.85</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/traffic-analysis.html</loc><lastmod>2025-09-14</lastmod><priority>0.85</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/firewall-rules.html</loc><lastmod>2025-09-14</lastmod><priority>0.85</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/wireless-security.html</loc><lastmod>2025-09-14</lastmod><priority>0.70</priority></url>
+
+  <!-- Web Security Modules -->
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/broken-access-control.html</loc><lastmod>2025-09-14</lastmod><priority>0.88</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/cryptographic-failures.html</loc><lastmod>2025-09-14</lastmod><priority>0.88</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/sql-injection.html</loc><lastmod>2025-09-14</lastmod><priority>0.92</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/cross-site-scripting-xss.html</loc><lastmod>2025-09-14</lastmod><priority>0.92</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/insecure-design-csrf.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/security-misconfiguration.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/vulnerable-components.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/authentication-failures.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/data-integrity-failures.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/logging-monitoring.html</loc><lastmod>2025-09-14</lastmod><priority>0.86</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/server-side-request-forgery-ssrf.html</loc><lastmod>2025-09-14</lastmod><priority>0.90</priority></url>
+  <url><loc>https://jwilliams.science/os3-security-studio/modules/data-exposure.html</loc><lastmod>2025-09-14</lastmod><priority>0.80</priority></url>
+</urlset>
+
