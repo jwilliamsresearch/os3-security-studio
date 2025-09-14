@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}DNS Tunneling Demo - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-exchange-alt text-warning"></i> DNS Tunneling Simulation</h2>
+                    <p class="text-muted">Educational demonstration of DNS tunneling for data exfiltration</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('dns_security.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to DNS Security
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tunnel"></i> DNS Tunneling in Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Educational Simulation:</strong> This demonstrates how attackers can exfiltrate data using DNS queries.
+                    </div>
+
+                    <h6>Data Being Exfiltrated:</h6>
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6>Sensitive Information:</h6>
+                            <pre class="bg-dark text-light p-2 rounded">{{ data.original }}</pre>
+                            
+                            <h6 class="mt-3">Base64 Encoded:</h6>
+                            <pre class="bg-secondary text-light p-2 rounded">{{ data.encoded }}</pre>
+                            
+                            <h6 class="mt-3">DNS Query Chunks:</h6>
+                            <div class="dns-queries">
+                                {% for chunk in data.chunks %}
+                                <div class="mb-2">
+                                    <code class="text-primary">{{ chunk }}.malicious-domain.com</code>
+                                    <span class="badge bg-secondary ms-2">{{ loop.index }}/{{ data.chunks|length }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6><i class="fas fa-eye"></i> Normal DNS Traffic</h6>
+                                </div>
+                                <div class="card-body">
+                                    <small class="text-muted">Typical DNS queries:</small>
+                                    <ul class="list-unstyled small">
+                                        <li><code>example.com A?</code></li>
+                                        <li><code>google.com A?</code></li>
+                                        <li><code>github.com A?</code></li>
+                                    </ul>
+                                    <span class="badge bg-success">NORMAL</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6><i class="fas fa-exclamation-triangle"></i> Suspicious DNS Traffic</h6>
+                                </div>
+                                <div class="card-body">
+                                    <small class="text-muted">Tunneling queries:</small>
+                                    <ul class="list-unstyled small">
+                                        <li><code>{{ data.chunks[0][:20] }}...malicious.com A?</code></li>
+                                        <li><code>{{ data.chunks[1][:20] if data.chunks|length > 1 }}...malicious.com A?</code></li>
+                                        <li><code>{{ data.chunks[2][:20] if data.chunks|length > 2 }}...malicious.com A?</code></li>
+                                    </ul>
+                                    <span class="badge bg-warning">SUSPICIOUS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Tunneling Statistics:</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="text-primary">{{ data.chunks|length }}</h4>
+                                    <small>DNS Queries</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="text-warning">{{ data.original|length }}</h4>
+                                    <small>Bytes Exfiltrated</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="text-success">{{ "%.1f"|format((data.original|length / data.chunks|length)) }}</h4>
+                                    <small>Avg Bytes/Query</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-shield-alt"></i> Detection & Prevention</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Detection Techniques:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-search text-info"></i> Monitor unusual subdomain patterns</li>
+                        <li><i class="fas fa-search text-info"></i> Analyze query length anomalies</li>
+                        <li><i class="fas fa-search text-info"></i> Check for base64-like patterns</li>
+                        <li><i class="fas fa-search text-info"></i> Monitor query frequency</li>
+                        <li><i class="fas fa-search text-info"></i> Domain reputation analysis</li>
+                    </ul>
+
+                    <h6 class="mt-3">Prevention Methods:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-ban text-danger"></i> DNS filtering and blacklisting</li>
+                        <li><i class="fas fa-ban text-danger"></i> Network segmentation</li>
+                        <li><i class="fas fa-ban text-danger"></i> Egress traffic monitoring</li>
+                        <li><i class="fas fa-ban text-danger"></i> DNS query analysis</li>
+                        <li><i class="fas fa-ban text-danger"></i> Endpoint protection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-tools"></i> Analysis Tools</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Detection Tools:</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-cog"></i> DNS monitoring solutions</li>
+                        <li><i class="fas fa-cog"></i> Network traffic analyzers</li>
+                        <li><i class="fas fa-cog"></i> SIEM integration</li>
+                        <li><i class="fas fa-cog"></i> Machine learning anomaly detection</li>
+                    </ul>
+
+                    <h6 class="mt-3">Response Actions:</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-bolt"></i> Block suspicious domains</li>
+                        <li><i class="fas fa-bolt"></i> Isolate affected systems</li>
+                        <li><i class="fas fa-bolt"></i> Analyze exfiltrated data</li>
+                        <li><i class="fas fa-bolt"></i> Update security policies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Notes:</h6>
+                <ul class="mb-0">
+                    <li><strong>DNS Tunneling:</strong> A technique that encodes data within DNS queries and responses to bypass security controls.</li>
+                    <li><strong>Common Use Cases:</strong> Data exfiltration, command and control communications, bypassing firewalls.</li>
+                    <li><strong>Detection Challenges:</strong> DNS traffic is often allowed through firewalls, making detection difficult.</li>
+                    <li><strong>Real-world Impact:</strong> Used in advanced persistent threats (APTs) and malware campaigns.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simulate real-time tunneling activity
+function updateTunnelingStats() {
+    // In a real implementation, this would show live tunneling data
+    console.log('DNS tunneling simulation active...');
+}
+
+// Update every 3 seconds
+setInterval(updateTunnelingStats, 3000);
+</script>
+{% endblock %}

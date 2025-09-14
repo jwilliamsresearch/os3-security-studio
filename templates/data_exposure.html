@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Data Exposure Demo - Newman Cyber Lab{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-eye-slash"></i> Sensitive Data Exposure</h5>
+<p><strong>What is it?</strong> Sensitive data exposure occurs when applications inadequately protect sensitive information like passwords, personal data, or financial records.</p>
+
+<h6>Common Vulnerabilities:</h6>
+<ul>
+    <li><strong>Unencrypted storage:</strong> Plain text passwords in databases</li>
+    <li><strong>Weak encryption:</strong> Outdated algorithms (MD5, SHA1)</li>
+    <li><strong>Information leakage:</strong> Exposing internal data in responses</li>
+    <li><strong>Insufficient transport security:</strong> HTTP instead of HTTPS</li>
+</ul>
+
+<h6>Data at Risk:</h6>
+<ul>
+    <li>Passwords and authentication credentials</li>
+    <li>Personal identifiable information (PII)</li>
+    <li>Financial and payment data</li>
+    <li>Health records and sensitive documents</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>Strong encryption at rest and in transit</li>
+    <li>Proper data classification</li>
+    <li>Secure key management</li>
+    <li>Data minimization principles</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-eye-slash"></i> Sensitive Data Exposure Demonstration</h2>
+        <p class="lead">Compare how sensitive data should and shouldn't be handled.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Insecure Data Handling</h5>
+            </div>
+            <div class="card-body">
+                <p>This version exposes sensitive data including password hashes and internal information.</p>
+                <div class="code-block">
+                    <code>SELECT username, password_hash, email FROM users</code>
+                </div>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> Exposes password hashes</li>
+                    <li><i class="fas fa-times text-danger"></i> Shows internal user data</li>
+                    <li><i class="fas fa-times text-danger"></i> No data filtering</li>
+                </ul>
+                <a href="{{ url_for('data_exposure_insecure') }}" class="btn btn-danger">View Exposed Data</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Secure Data Handling</h5>
+            </div>
+            <div class="card-body">
+                <p>This version only exposes necessary data and protects sensitive information.</p>
+                <div class="code-block">
+                    <code>SELECT username, email FROM users</code>
+                </div>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Hides password hashes</li>
+                    <li><i class="fas fa-check text-success"></i> Minimal data exposure</li>
+                    <li><i class="fas fa-check text-success"></i> Proper data filtering</li>
+                </ul>
+                <a href="{{ url_for('data_exposure_secure') }}" class="btn btn-success">View Protected Data</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-lightbulb"></i> Data Exposure Examples</h5>
+    <p>Common sensitive data that should never be exposed:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <h6>Authentication Data:</h6>
+            <ul>
+                <li>Password hashes</li>
+                <li>Salt values</li>
+                <li>Session tokens</li>
+                <li>API keys</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h6>Personal Information:</h6>
+            <ul>
+                <li>Social security numbers</li>
+                <li>Credit card numbers</li>
+                <li>Phone numbers</li>
+                <li>Home addresses</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand what constitutes sensitive data</li>
+        <li>Learn to identify data exposure vulnerabilities</li>
+        <li>Practice proper data filtering techniques</li>
+        <li>Implement data minimization principles</li>
+    </ul>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-lock"></i> Encryption and Hashing</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Secure Password Storage:</h6>
+                <p class="small">This application uses proper password hashing:</p>
+                <div class="code-block">
+                    <code>
+from werkzeug.security import generate_password_hash<br>
+password_hash = generate_password_hash(password)
+                    </code>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6>What NOT to do:</h6>
+                <p class="small text-danger">Never store passwords in plain text or use weak hashing:</p>
+                <div class="code-block">
+                    <code class="text-danger">
+# DON'T DO THIS!<br>
+password = "plaintext"  # ❌<br>
+md5_hash = hashlib.md5(password)  # ❌
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

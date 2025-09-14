@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}File Upload - Insecure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE VERSION - File Upload Vulnerable</h4>
+            <p class="mb-0">This version accepts any file type and uses original filenames - dangerous!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-upload"></i> File Upload (Vulnerable)</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Choose file to upload:</label>
+                        <input type="file" class="form-control" name="file" required>
+                        <div class="form-text text-danger">Warning: No file type restrictions!</div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-upload"></i> Upload File (Insecure)
+                    </button>
+                </form>
+
+                {% if files %}
+                <hr>
+                <h6>Your Uploaded Files:</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Original Filename</th>
+                                <th>Stored As</th>
+                                <th>Upload Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in files %}
+                            <tr>
+                                <td>{{ file[1] }}</td>
+                                <td><code>{{ file[0] }}</code></td>
+                                <td>{{ file[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerable Code:</h6>
+                <div class="code-block">
+                    <code>
+filename = file.filename<br>
+file_path = os.path.join(upload_folder, filename)<br>
+file.save(file_path)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Security Issues:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> No file type validation</li>
+                    <li><i class="fas fa-times text-danger"></i> Direct filename usage</li>
+                    <li><i class="fas fa-times text-danger"></i> Path traversal possible</li>
+                    <li><i class="fas fa-times text-danger"></i> No size limits</li>
+                </ul>
+
+                <h6 class="mt-3">Potential Attacks:</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <strong>Web Shell Upload</strong><br>
+                        <small class="text-muted">Upload .php files containing malicious code</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Path Traversal</strong><br>
+                        <small class="text-muted">Filename: <code>../../../etc/passwd</code></small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>MIME Spoofing</strong><br>
+                        <small class="text-muted">Disguise executable as image</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>DoS Attack</strong><br>
+                        <small class="text-muted">Upload very large files</small>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('file_upload.secure') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-shield-alt"></i> See Secure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

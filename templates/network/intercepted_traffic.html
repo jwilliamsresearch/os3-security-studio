@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Intercepted Traffic Log - OS³{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-list"></i> Network Traffic Monitor</h2>
+        <p class="lead">Real-time view of HTTP transmissions captured during this session.</p>
+        
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Educational Simulation:</strong> This demonstrates what attackers can see when monitoring HTTP traffic. 
+            In real scenarios, this data would be permanently compromised and accessible to malicious actors.
+        </div>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Status:</strong> <span id="monitor-status" class="text-success">Monitoring Active</span> | 
+            Session Time: <span id="session-time">00:00</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-network-wired"></i> Traffic Analysis</h5>
+                <div>
+                    <span class="badge bg-danger">{{ intercepted_traffic|length }} HTTP Requests Captured</span>
+                    <span class="badge bg-info">{{ total_intercepted }} Total Global Intercepts</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if intercepted_traffic %}
+                    {% for traffic in intercepted_traffic %}
+                    <div class="card border-danger mb-3">
+                        <div class="card-header bg-light">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                                        HTTP Request #{{ loop.index }}
+                                    </h6>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <small class="text-muted">{{ traffic.timestamp }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-globe"></i> Request Details:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Method:</strong> {{ traffic.method }}</li>
+                                        <li><strong>URL:</strong> {{ traffic.url }}</li>
+                                        <li><strong>Protocol:</strong> {{ traffic.protocol }}</li>
+                                        <li><strong>Source IP:</strong> {{ traffic.source_ip }}</li>
+                                        <li><strong>User Agent:</strong> <small>{{ traffic.user_agent[:50] }}...</small></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-key text-danger"></i> Compromised Credentials:</h6>
+                                    <div class="alert alert-danger">
+                                        <strong>Username:</strong> <code>{{ traffic.form_data.username }}</code><br>
+                                        <strong>Password:</strong> <code>{{ traffic.form_data.password }}</code>
+                                    </div>
+                                    
+                                    <h6><i class="fas fa-shield-alt"></i> Security Status:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><span class="text-danger"><i class="fas fa-times"></i> Not Encrypted</span></li>
+                                        <li><span class="text-danger"><i class="fas fa-times"></i> No Authentication</span></li>
+                                        <li><span class="text-danger"><i class="fas fa-times"></i> No Integrity Check</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6><i class="fas fa-code"></i> Raw HTTP Request:</h6>
+                                <div class="code-block">
+                                    <small>
+                                        {{ traffic.method }} {{ traffic.url }} {{ traffic.protocol }}<br>
+                                        Host: cyberlab.newman.ac.uk<br>
+                                        User-Agent: {{ traffic.user_agent }}<br>
+                                        Content-Type: application/x-www-form-urlencoded<br>
+                                        Content-Length: {{ (traffic.form_data.username|length + traffic.form_data.password|length + 20) }}<br>
+                                        <br>
+                                        <span class="text-danger">username={{ traffic.form_data.username }}&password={{ traffic.form_data.password }}</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                        <h4>No HTTP Traffic Intercepted</h4>
+                        <p class="text-muted">No insecure HTTP transmissions have been captured in this session.</p>
+                        <p>Try the <a href="{{ url_for('network_protocols.index') }}">HTTP vs HTTPS demo</a> to see how data can be intercepted.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if intercepted_traffic %}
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-chart-pie"></i> Attack Analysis</h5>
+            </div>
+            <div class="card-body">
+                <h6>What an attacker gained:</h6>
+                <ul>
+                    <li><strong>{{ intercepted_traffic|length }}</strong> sets of login credentials</li>
+                    <li><strong>{{ unique_usernames }}</strong> unique usernames</li>
+                    <li>Complete network request metadata</li>
+                    <li>User behavior patterns</li>
+                    <li>System information from User-Agent strings</li>
+                </ul>
+                
+                <h6 class="mt-3">Potential Impact:</h6>
+                <ul>
+                    <li>Account takeover attacks</li>
+                    <li>Credential stuffing on other sites</li>
+                    <li>Identity theft</li>
+                    <li>Corporate data breach</li>
+                    <li>Financial fraud</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> How to Prevent</h5>
+            </div>
+            <div class="card-body">
+                <h6>Technical Measures:</h6>
+                <ul>
+                    <li><strong>Always use HTTPS</strong> for any sensitive data</li>
+                    <li><strong>HSTS headers</strong> to enforce secure connections</li>
+                    <li><strong>Certificate pinning</strong> for mobile apps</li>
+                    <li><strong>Secure cookie flags</strong> (Secure, HttpOnly)</li>
+                    <li><strong>Content Security Policy</strong> headers</li>
+                </ul>
+                
+                <h6 class="mt-3">User Education:</h6>
+                <ul>
+                    <li>Check for <i class="fas fa-lock"></i> lock icon in browser</li>
+                    <li>Verify HTTPS in the URL</li>
+                    <li>Avoid public Wi-Fi for sensitive activities</li>
+                    <li>Use VPN on untrusted networks</li>
+                    <li>Keep browsers and devices updated</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('network_protocols.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Protocol Demo
+        </a>
+        {% if intercepted_traffic %}
+        <a href="{{ url_for('network_protocols.clear_traffic') }}" class="btn btn-warning">
+            <i class="fas fa-trash"></i> Clear Intercepted Data
+        </a>
+        {% endif %}
+        <a href="{{ url_for('network_protocols.mitm_simulation') }}" class="btn btn-info">
+            <i class="fas fa-user-secret"></i> Learn About MITM Attacks
+        </a>
+    </div>
+</div>
+
+<style>
+.code-block {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-family: 'Courier New', monospace;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.card-body .list-unstyled li {
+    margin-bottom: 0.25rem;
+}
+
+.monitor-blink {
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+</style>
+
+<script>
+// Simulate real-time monitoring feel
+let startTime = new Date();
+let lastUpdateTime = new Date();
+let currentTrafficCount = {{ intercepted_traffic|length }};
+
+function updateTimer() {
+    let now = new Date();
+    let elapsed = Math.floor((now - startTime) / 1000);
+    let minutes = Math.floor(elapsed / 60);
+    let seconds = elapsed % 60;
+    document.getElementById('session-time').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function checkForNewTraffic() {
+    fetch('/protocol-security/intercepted/count')
+    .then(response => response.json())
+    .then(data => {
+        if (data.count > currentTrafficCount) {
+            // New traffic detected, show notification and reload
+            showNewTrafficNotification(data.count - currentTrafficCount);
+            currentTrafficCount = data.count;
+            
+            // Reload page content after a short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    })
+    .catch(error => {
+        console.log('Auto-refresh check failed:', error);
+    });
+}
+
+function showNewTrafficNotification(newCount) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-2';
+    alertDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>New Traffic Detected!</strong> ${newCount} new HTTP interception${newCount > 1 ? 's' : ''} captured. Refreshing data...
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.col-12').appendChild(alertDiv);
+    
+    // Update status to show activity
+    const statusElement = document.getElementById('monitor-status');
+    if (statusElement) {
+        statusElement.textContent = 'New Data Detected';
+        statusElement.className = 'text-warning monitor-blink';
+    }
+}
+
+// Update timer every second
+setInterval(updateTimer, 1000);
+
+// Check for new traffic every 3 seconds
+setInterval(checkForNewTraffic, 3000);
+
+// Make status indicator blink
+document.addEventListener('DOMContentLoaded', function() {
+    const statusElement = document.getElementById('monitor-status');
+    if (statusElement) {
+        statusElement.classList.add('monitor-blink');
+    }
+    
+    // Show notification about auto-refresh
+    setTimeout(() => {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info alert-dismissible fade show mt-2';
+        alertDiv.innerHTML = `
+            <i class="fas fa-sync-alt"></i>
+            <strong>Live Monitoring Active:</strong> This page automatically detects new intercepted traffic every 3 seconds.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.col-12').appendChild(alertDiv);
+        
+        // Auto-hide after 8 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 8000);
+    }, 1500);
+});
+</script>
+{% endblock %}

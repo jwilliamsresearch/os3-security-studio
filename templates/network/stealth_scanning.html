@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}Stealth Port Scanning - Newman Cyber Lab{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-eye-slash"></i> Stealth Port Scanning Module
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Learn advanced stealth scanning techniques that help bypass network detection systems
+                        and intrusion detection systems (IDS). This module demonstrates how attackers can 
+                        scan networks while minimizing their detection footprint.
+                    </p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Educational Purpose:</strong> This module is for educational purposes only. 
+                        Only scan networks you own or have explicit permission to test.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Configuration -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs"></i> Stealth Scan Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="stealthScanForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="targetInput" class="form-label">Target IP/Domain</label>
+                                    <input type="text" class="form-control" id="targetInput" 
+                                           value="scanme.nmap.org" placeholder="e.g., scanme.nmap.org">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="portsInput" class="form-label">Port Range</label>
+                                    <input type="text" class="form-control" id="portsInput" 
+                                           value="1-1000" placeholder="e.g., 80,443 or 1-1000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="techniqueSelect" class="form-label">Stealth Technique</label>
+                                    <select class="form-select" id="techniqueSelect">
+                                        <option value="SYN Stealth Scan">SYN Stealth Scan (-sS)</option>
+                                        <option value="FIN Scan">FIN Scan (-sF)</option>
+                                        <option value="NULL Scan">NULL Scan (-sN)</option>
+                                        <option value="XMAS Scan">XMAS Scan (-sX)</option>
+                                        <option value="Idle/Zombie Scan">Idle/Zombie Scan (-sI)</option>
+                                        <option value="Fragmented Packets">Fragmented Packets (-f)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="timingSelect" class="form-label">Timing Template</label>
+                                    <select class="form-select" id="timingSelect">
+                                        <option value="T1">T1 - Paranoid (Very Slow)</option>
+                                        <option value="T2">T2 - Sneaky (Slow)</option>
+                                        <option value="T3" selected>T3 - Normal</option>
+                                        <option value="T4">T4 - Aggressive (Fast)</option>
+                                        <option value="T5">T5 - Insane (Very Fast)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-play"></i> Start Stealth Scan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Summary -->
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Current Configuration
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Target:</strong></td>
+                            <td><span id="displayTarget">scanme.nmap.org</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Technique:</strong></td>
+                            <td><span id="displayTechnique">SYN Stealth Scan</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timing:</strong></td>
+                            <td><span id="displayTiming">T3</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status:</strong></td>
+                            <td><span id="displayStatus" class="badge bg-secondary">Ready</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card border-warning mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Detection Risk
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-success" style="width: 75%">
+                            <span id="riskLevel">Low Risk (75%)</span>
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-clock"></i> <span id="estimatedTime">4-8 minutes (Normal speed)</span>
+                    </small>
+                </div>
+            </div>
+
+            <div class="card border-dark mt-3">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-terminal"></i> Command Preview
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <code id="commandPreview" class="d-block text-wrap">
+                        nmap -sS -T3 -p 1-1000 scanme.nmap.org
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="row mt-4" id="resultsSection" style="display: none;">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Scan Progress & Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="scanStatus">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Initializing stealth scan...
+                        </div>
+                    </div>
+
+                    <div id="scanProgress">
+                        <h6>Progress:</h6>
+                        <div class="progress mb-3" style="height: 25px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                 style="width: 0%">0%</div>
+                        </div>
+                    </div>
+
+                    <div id="scanResults" style="display: none;">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stealth Techniques Comparison -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-eye-slash"></i> Stealth Techniques Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Technique</th>
+                                    <th>Stealth Level</th>
+                                    <th>Speed</th>
+                                    <th>Reliability</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SYN Stealth Scan</strong></td>
+                                    <td><span class="badge bg-warning">75%</span></td>
+                                    <td><span class="badge bg-success">Fast</span></td>
+                                    <td><span class="badge bg-success">High</span></td>
+                                    <td>Sends SYN packets without completing TCP handshake</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>FIN Scan</strong></td>
+                                    <td><span class="badge bg-warning">80%</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td>Sends FIN packets to closed ports</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>NULL Scan</strong></td>
+                                    <td><span class="badge bg-success">85%</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td>Sends packets with no flags set</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XMAS Scan</strong></td>
+                                    <td><span class="badge bg-success">85%</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td>Sends packets with FIN, PSH, and URG flags</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Idle/Zombie Scan</strong></td>
+                                    <td><span class="badge bg-success">95%</span></td>
+                                    <td><span class="badge bg-danger">Slow</span></td>
+                                    <td><span class="badge bg-success">High</span></td>
+                                    <td>Uses third-party host to perform scan</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fragmented Packets</strong></td>
+                                    <td><span class="badge bg-warning">70%</span></td>
+                                    <td><span class="badge bg-danger">Slow</span></td>
+                                    <td><span class="badge bg-warning">Medium</span></td>
+                                    <td>Splits scan packets into fragments</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Educational Information -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-graduation-cap"></i> Learning Objectives
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Understand different stealth scanning techniques</li>
+                        <li><i class="fas fa-check text-success"></i> Learn about detection evasion methods</li>
+                        <li><i class="fas fa-check text-success"></i> Practice timing and packet manipulation</li>
+                        <li><i class="fas fa-check text-success"></i> Analyze stealth vs. speed trade-offs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Defense Considerations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-shield-alt text-primary"></i> Deploy network intrusion detection systems</li>
+                        <li><i class="fas fa-shield-alt text-primary"></i> Monitor for suspicious connection patterns</li>
+                        <li><i class="fas fa-shield-alt text-primary"></i> Use firewall logging and analysis</li>
+                        <li><i class="fas fa-shield-alt text-primary"></i> Implement rate limiting and connection throttling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update configuration display when form inputs change
+function updateConfigDisplay() {
+    const target = document.getElementById('targetInput').value;
+    const technique = document.getElementById('techniqueSelect').value;
+    const timing = document.getElementById('timingSelect').value;
+    const ports = document.getElementById('portsInput').value;
+    
+    // Update display elements
+    document.getElementById('displayTarget').textContent = target;
+    document.getElementById('displayTechnique').textContent = technique;
+    document.getElementById('displayTiming').textContent = timing;
+    
+    // Update command preview
+    const techniqueMap = {
+        'SYN Stealth Scan': '-sS',
+        'FIN Scan': '-sF',
+        'NULL Scan': '-sN',
+        'XMAS Scan': '-sX',
+        'Idle/Zombie Scan': '-sI',
+        'Fragmented Packets': '-f'
+    };
+    
+    const timingMap = {
+        'T1': '-T1',
+        'T2': '-T2', 
+        'T3': '-T3',
+        'T4': '-T4',
+        'T5': '-T5'
+    };
+    
+    const command = `nmap ${techniqueMap[technique]} ${timingMap[timing]} -p ${ports} ${target}`;
+    document.getElementById('commandPreview').textContent = command;
+    
+    // Update detection risk based on technique
+    const riskLevels = {
+        'SYN Stealth Scan': { level: 75, color: 'warning', text: 'Low Risk (75%)' },
+        'FIN Scan': { level: 80, color: 'success', text: 'Very Low Risk (80%)' },
+        'NULL Scan': { level: 85, color: 'success', text: 'Very Low Risk (85%)' },
+        'XMAS Scan': { level: 85, color: 'success', text: 'Very Low Risk (85%)' },
+        'Idle/Zombie Scan': { level: 95, color: 'success', text: 'Minimal Risk (95%)' },
+        'Fragmented Packets': { level: 70, color: 'warning', text: 'Low Risk (70%)' }
+    };
+    
+    const risk = riskLevels[technique];
+    const progressBar = document.querySelector('#riskLevel').parentElement;
+    progressBar.style.width = risk.level + '%';
+    progressBar.className = `progress-bar bg-${risk.color}`;
+    document.getElementById('riskLevel').textContent = risk.text;
+    
+    // Update timing information
+    const timingInfo = {
+        'T1': '15-30 minutes (Very slow, very stealthy)',
+        'T2': '8-15 minutes (Slow, stealthy)',
+        'T3': '4-8 minutes (Normal speed)',
+        'T4': '2-4 minutes (Fast, more detectable)',
+        'T5': '30-90 seconds (Very fast, easily detected)'
+    };
+    
+    document.getElementById('estimatedTime').textContent = timingInfo[timing];
+}
+
+// Handle form submission
+document.getElementById('stealthScanForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        target: document.getElementById('targetInput').value,
+        technique: document.getElementById('techniqueSelect').value,
+        timing: document.getElementById('timingSelect').value,
+        ports: document.getElementById('portsInput').value
+    };
+    
+    // Show results section and start scan
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('displayStatus').textContent = 'Scanning...';
+    document.getElementById('displayStatus').className = 'badge bg-warning';
+    
+    // Start the scan
+    fetch('/port-scanning/stealth/run', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            simulateProgress(data.results);
+        } else {
+            showError('Scan failed: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        showError('Network error: ' + error.message);
+    });
+});
+
+function simulateProgress(results) {
+    const progressBar = document.getElementById('progressBar');
+    const statusDiv = document.getElementById('scanStatus');
+    let progress = 0;
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = Math.round(progress) + '%';
+        
+        if (progress < 30) {
+            statusDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-search"></i> Probing target...</div>';
+        } else if (progress < 70) {
+            statusDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-network-wired"></i> Scanning ports...</div>';
+        } else if (progress < 100) {
+            statusDiv.innerHTML = '<div class="alert alert-primary"><i class="fas fa-chart-line"></i> Analyzing results...</div>';
+        } else {
+            statusDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> Scan completed successfully!</div>';
+            showResults(results);
+            clearInterval(interval);
+            document.getElementById('displayStatus').textContent = 'Complete';
+            document.getElementById('displayStatus').className = 'badge bg-success';
+        }
+    }, 200);
+}
+
+function showResults(results) {
+    const resultsDiv = document.getElementById('scanResults');
+    let html = '<div class="mt-3"><h6>Scan Results:</h6>';
+    html += '<div class="table-responsive"><table class="table table-sm">';
+    html += '<thead><tr><th>Port</th><th>State</th><th>Service</th><th>Method</th></tr></thead><tbody>';
+    
+    results.forEach(result => {
+        const statusClass = result.status === 'open' ? 'table-success' : 
+                          result.status === 'filtered' ? 'table-warning' : 'table-secondary';
+        const statusBadge = result.status === 'open' ? 'bg-success' : 
+                          result.status === 'filtered' ? 'bg-warning' : 'bg-secondary';
+        
+        html += `<tr class="${statusClass}">
+            <td>${result.port}</td>
+            <td><span class="badge ${statusBadge}">${result.status}</span></td>
+            <td>${result.service}</td>
+            <td>Stealth</td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    html += `<div class="alert alert-info mt-2">
+        <strong>Detection Risk:</strong> Low<br>
+        <strong>Scan Duration:</strong> ${Math.random() * 3 + 1}s<br>
+        <strong>Packets Sent:</strong> ${results.length * 2}
+    </div></div>`;
+    
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+}
+
+function showError(message) {
+    document.getElementById('scanStatus').innerHTML = 
+        `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+    document.getElementById('scanProgress').style.display = 'none';
+    document.getElementById('displayStatus').textContent = 'Error';
+    document.getElementById('displayStatus').className = 'badge bg-danger';
+}
+
+// Add event listeners to form inputs
+document.getElementById('targetInput').addEventListener('input', updateConfigDisplay);
+document.getElementById('techniqueSelect').addEventListener('change', updateConfigDisplay);
+document.getElementById('timingSelect').addEventListener('change', updateConfigDisplay);
+document.getElementById('portsInput').addEventListener('input', updateConfigDisplay);
+
+// Initialize display
+document.addEventListener('DOMContentLoaded', updateConfigDisplay);
+</script>
+
+{% endblock %}

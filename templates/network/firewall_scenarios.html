@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Firewall Scenarios - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-scenario text-success"></i> Firewall Configuration Scenarios</h2>
+                    <p class="text-muted">Pre-configured firewall setups for common network environments</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('firewall_sim.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Firewall
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for scenario in scenarios %}
+        <div class="col-md-6 mb-4">
+            <div class="card border-{{ scenario.difficulty_color }} h-100">
+                <div class="card-header bg-{{ scenario.difficulty_color }} text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-{{ scenario.icon }}"></i> {{ scenario.name }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-{{ scenario.difficulty_color }}">{{ scenario.difficulty }}</span>
+                        <span class="badge bg-secondary ms-1">{{ scenario.category }}</span>
+                        <span class="badge bg-info ms-1">{{ scenario.rules_count }} rules</span>
+                    </div>
+                    
+                    <p class="card-text">{{ scenario.description }}</p>
+                    
+                    <h6>Network Environment:</h6>
+                    <ul class="small">
+                        <li><strong>Network:</strong> {{ scenario.network.subnet }}</li>
+                        <li><strong>Users:</strong> {{ scenario.network.users }}</li>
+                        <li><strong>Services:</strong> {{ scenario.network.services|join(', ') }}</li>
+                        <li><strong>Threats:</strong> {{ scenario.network.threats|join(', ') }}</li>
+                    </ul>
+                    
+                    <h6>Key Rules:</h6>
+                    <ul class="list-unstyled small">
+                        {% for rule in scenario.key_rules %}
+                        <li class="mb-1">
+                            <span class="badge bg-{{ rule.action_color }}">{{ rule.action }}</span>
+                            {{ rule.description }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h6>Learning Objectives:</h6>
+                    <ul class="small">
+                        {% for objective in scenario.objectives %}
+                        <li>{{ objective }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h6>Security Considerations:</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h4 text-{{ scenario.security.level_color }}">{{ scenario.security.level }}</div>
+                                <small>Security Level</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h4 text-{{ scenario.security.complexity_color }}">{{ scenario.security.complexity }}</div>
+                                <small>Complexity</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100">
+                        <button class="btn btn-primary" onclick="loadScenario('{{ scenario.id }}')">
+                            <i class="fas fa-download"></i> Load Scenario
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="previewScenario('{{ scenario.id }}')">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-tools"></i> Scenario Management</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Create Custom Scenario:</h6>
+                            <form id="custom-scenario-form">
+                                <div class="mb-2">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           placeholder="Scenario name" required>
+                                </div>
+                                <div class="mb-2">
+                                    <textarea class="form-control form-control-sm" rows="2" 
+                                              placeholder="Description" required></textarea>
+                                </div>
+                                <div class="mb-2">
+                                    <select class="form-select form-select-sm" required>
+                                        <option value="">Select category</option>
+                                        <option value="enterprise">Enterprise</option>
+                                        <option value="home">Home Network</option>
+                                        <option value="dmz">DMZ Setup</option>
+                                        <option value="education">Educational</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-success w-100" onclick="createCustomScenario()">
+                                    <i class="fas fa-plus"></i> Create Scenario
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Import/Export:</h6>
+                            <div class="mb-2">
+                                <button class="btn btn-sm btn-outline-primary w-100" onclick="exportScenarios()">
+                                    <i class="fas fa-download"></i> Export All Scenarios
+                                </button>
+                            </div>
+                            <div class="mb-2">
+                                <input type="file" class="form-control form-control-sm" 
+                                       accept=".json" onchange="importScenario(this)">
+                            </div>
+                            <div class="mb-2">
+                                <button class="btn btn-sm btn-outline-info w-100" onclick="resetToDefaults()">
+                                    <i class="fas fa-undo"></i> Reset to Defaults
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Scenario Statistics:</h6>
+                            <ul class="small list-unstyled">
+                                <li>Total Scenarios: <span class="badge bg-primary">{{ scenarios|length }}</span></li>
+                                <li>Most Used: <span class="text-primary">Basic Home Network</span></li>
+                                <li>Average Rules: <span class="badge bg-info">{{ avg_rules }}</span></li>
+                                <li>Custom Scenarios: <span class="badge bg-success">{{ custom_count }}</span></li>
+                            </ul>
+                            
+                            <h6 class="mt-3">Quick Actions:</h6>
+                            <div class="btn-group-vertical w-100">
+                                <button class="btn btn-sm btn-outline-warning" onclick="compareScenarios()">
+                                    <i class="fas fa-balance-scale"></i> Compare Scenarios
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="scenarioWizard()">
+                                    <i class="fas fa-magic"></i> Configuration Wizard
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-success">
+                <h6><i class="fas fa-graduation-cap"></i> Scenario Learning Path:</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>Beginner:</h6>
+                        <ul class="small mb-0">
+                            <li>Basic Home Network</li>
+                            <li>Simple Office Setup</li>
+                            <li>Essential service rules</li>
+                            <li>Default deny policies</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Intermediate:</h6>
+                        <ul class="small mb-0">
+                            <li>Small Business Network</li>
+                            <li>Guest network isolation</li>
+                            <li>VPN integration</li>
+                            <li>Content filtering</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Advanced:</h6>
+                        <ul class="small mb-0">
+                            <li>Enterprise DMZ</li>
+                            <li>Multi-tier architecture</li>
+                            <li>Advanced threat protection</li>
+                            <li>Load balancing rules</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Expert:</h6>
+                        <ul class="small mb-0">
+                            <li>Zero Trust Network</li>
+                            <li>Micro-segmentation</li>
+                            <li>Custom protocol handling</li>
+                            <li>Automated threat response</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scenario Preview Modal -->
+<div class="modal fade" id="scenarioPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Scenario Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="scenario-preview-content">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="loadPreviewedScenario()">Load This Scenario</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let previewedScenarioId = null;
+
+function loadScenario(scenarioId) {
+    if (confirm('Loading this scenario will replace your current firewall configuration. Continue?')) {
+        // In a real implementation, this would make an AJAX call to load the scenario
+        alert('Loading scenario: ' + scenarioId + '\n\nScenario loaded successfully! Check the main firewall page to see the new rules.');
+        
+        // Redirect to main firewall page
+        window.location.href = "{{ url_for('firewall_sim.index') }}";
+    }
+}
+
+function previewScenario(scenarioId) {
+    previewedScenarioId = scenarioId;
+    
+    // In a real implementation, this would fetch scenario details via AJAX
+    const previewContent = `
+        <h6>Scenario: ${scenarioId}</h6>
+        <p>This scenario includes the following configuration:</p>
+        <ul>
+            <li>Network segmentation rules</li>
+            <li>Service-specific access controls</li>
+            <li>Security policies</li>
+            <li>Logging and monitoring setup</li>
+        </ul>
+        <h6>Rules Preview:</h6>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Priority</th><th>Action</th><th>Source</th><th>Destination</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td><span class="badge bg-success">ALLOW</span></td><td>LAN</td><td>Internet</td><td>Web browsing</td></tr>
+                    <tr><td>2</td><td><span class="badge bg-danger">DENY</span></td><td>Guest</td><td>LAN</td><td>Network isolation</td></tr>
+                    <tr><td>3</td><td><span class="badge bg-warning">LOG</span></td><td>Any</td><td>Any</td><td>All traffic</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('scenario-preview-content').innerHTML = previewContent;
+    new bootstrap.Modal(document.getElementById('scenarioPreviewModal')).show();
+}
+
+function loadPreviewedScenario() {
+    if (previewedScenarioId) {
+        loadScenario(previewedScenarioId);
+    }
+}
+
+function createCustomScenario() {
+    const form = document.getElementById('custom-scenario-form');
+    const formData = new FormData(form);
+    
+    // In a real implementation, this would save the custom scenario
+    alert('Custom scenario created successfully!\n\nYou can now configure the rules and save the scenario.');
+    form.reset();
+}
+
+function exportScenarios() {
+    alert('Exporting all firewall scenarios...\n\nIn a real system, this would download a JSON file containing all scenario configurations.');
+}
+
+function importScenario(input) {
+    if (input.files && input.files[0]) {
+        alert('Importing firewall scenario...\n\nIn a real system, this would parse and load the scenario from the selected file.');
+        input.value = ''; // Reset file input
+    }
+}
+
+function resetToDefaults() {
+    if (confirm('This will restore all scenarios to their default configurations. Continue?')) {
+        alert('All scenarios have been reset to default configurations.');
+        location.reload();
+    }
+}
+
+function compareScenarios() {
+    alert('Scenario comparison tool would allow you to:\n\n• Compare rule sets between scenarios\n• Identify differences in security levels\n• Analyze configuration complexity\n• Generate comparison reports');
+}
+
+function scenarioWizard() {
+    alert('Configuration wizard would guide you through:\n\n• Network topology assessment\n• Security requirement analysis\n• Automated rule generation\n• Best practice recommendations\n• Testing and validation');
+}
+
+// Initialize tooltips and other UI enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Firewall scenarios page loaded');
+});
+</script>
+{% endblock %}

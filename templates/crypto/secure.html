@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Cryptography - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-shield-alt text-success"></i> Secure Cryptography</h5>
+<p><strong>Security Implementation:</strong> This page demonstrates industry-standard cryptographic practices that provide strong protection.</p>
+
+<h6>Security Features:</h6>
+<ul>
+    <li><strong>bcrypt Hashing:</strong> Slow, salted, adaptive cost factor</li>
+    <li><strong>PBKDF2 Key Derivation:</strong> Proper key generation from passwords</li>
+    <li><strong>Random Salt:</strong> Unique salt for each password</li>
+    <li><strong>AES Encryption:</strong> Industry-standard symmetric encryption</li>
+</ul>
+
+<h6>Security Benefits:</h6>
+<ul>
+    <li>Resistant to rainbow table attacks</li>
+    <li>Computationally expensive to brute force</li>
+    <li>Authenticated encryption with integrity</li>
+    <li>Cryptographically secure random generation</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> Secure Cryptography Implementation</h4>
+            <p>This demonstration uses <strong>industry-standard</strong> cryptographic practices. These methods are suitable for production use.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-hashtag"></i> Strong Password Hashing</h5>
+            </div>
+            <div class="card-body">
+                <p>Using bcrypt with automatic salt generation and adaptive cost:</p>
+                <form id="strongHashForm">
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="strongPassword" placeholder="Enter password" value="password123">
+                    </div>
+                    <div class="mb-3">
+                        <label for="costFactor" class="form-label">Cost Factor (higher = more secure, slower):</label>
+                        <select class="form-control" id="costFactor">
+                            <option value="10">10 (fast, less secure)</option>
+                            <option value="12" selected>12 (recommended)</option>
+                            <option value="14">14 (slow, very secure)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Generate Strong Hash</button>
+                </form>
+                <div id="strongHashResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Code:</strong><br>
+                        <code>salt = bcrypt.gensalt(rounds=12)<br>
+                        hash = bcrypt.hashpw(password, salt)</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-lock"></i> Strong Encryption</h5>
+            </div>
+            <div class="card-body">
+                <p>Using AES encryption with PBKDF2 key derivation:</p>
+                <form id="strongEncryptForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="strongData" placeholder="Enter data to encrypt" value="Secret credit card: 4532-1234-5678-9012">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="encryptPassword" placeholder="Enter encryption password" value="MySecurePassword123!">
+                    </div>
+                    <button type="submit" class="btn btn-success">Encrypt with Strong Method</button>
+                </form>
+                <div id="strongEncryptResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Code:</strong><br>
+                        <code>key = PBKDF2(password, salt, 100000)<br>
+                        encrypted = Fernet(key).encrypt(data)</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-key"></i> Key Derivation</h5>
+            </div>
+            <div class="card-body">
+                <p>Demonstrate PBKDF2 key derivation from password:</p>
+                <form id="keyDerivationForm">
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="keyPassword" placeholder="Enter password" value="MyPassword123">
+                    </div>
+                    <div class="mb-3">
+                        <label for="iterations" class="form-label">Iterations:</label>
+                        <select class="form-control" id="iterations">
+                            <option value="10000">10,000 (minimum)</option>
+                            <option value="100000" selected>100,000 (recommended)</option>
+                            <option value="1000000">1,000,000 (high security)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-info">Derive Key</button>
+                </form>
+                <div id="keyDerivationResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-warning mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-unlock"></i> Decryption</h5>
+            </div>
+            <div class="card-body">
+                <p>Decrypt data encrypted above:</p>
+                <form id="decryptForm">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="encryptedData" placeholder="Paste encrypted data here" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="decryptPassword" placeholder="Enter decryption password">
+                    </div>
+                    <button type="submit" class="btn btn-warning">Decrypt Data</button>
+                </form>
+                <div id="decryptResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> Security Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Why bcrypt is Secure:</h6>
+                        <ul>
+                            <li><strong>Adaptive:</strong> Cost factor can be increased over time</li>
+                            <li><strong>Salted:</strong> Each hash uses a unique random salt</li>
+                            <li><strong>Slow:</strong> Computationally expensive to brute force</li>
+                            <li><strong>Proven:</strong> Widely tested and battle-hardened</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Why AES+PBKDF2 is Secure:</h6>
+                        <ul>
+                            <li><strong>AES-128:</strong> Government-approved encryption standard</li>
+                            <li><strong>PBKDF2:</strong> Secure key derivation from passwords</li>
+                            <li><strong>Random Salt:</strong> Prevents rainbow table attacks</li>
+                            <li><strong>High Iterations:</strong> Makes brute force impractical</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-lightbulb"></i> Best Practices Demonstrated:</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>For Passwords:</strong>
+                            <ul class="mb-0">
+                                <li>Use bcrypt or Argon2</li>
+                                <li>Cost factor ≥ 12</li>
+                                <li>Never store plaintext</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>For Encryption:</strong>
+                            <ul class="mb-0">
+                                <li>Use AES with proper modes</li>
+                                <li>PBKDF2 for key derivation</li>
+                                <li>≥100,000 iterations</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>For Keys:</strong>
+                            <ul class="mb-0">
+                                <li>Cryptographically secure random</li>
+                                <li>Proper key management</li>
+                                <li>Regular key rotation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('crypto.insecure') }}" class="btn btn-danger btn-lg">
+            <i class="fas fa-exclamation-triangle"></i> Compare with Insecure Version
+        </a>
+        <a href="{{ url_for('crypto.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+let currentEncryptedData = '';
+let currentEncryptPassword = '';
+
+document.getElementById('strongHashForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const password = document.getElementById('strongPassword').value;
+    const cost = parseInt(document.getElementById('costFactor').value);
+    
+    const startTime = performance.now();
+    
+    fetch('/crypto/strong_hash', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password, cost: cost})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const endTime = performance.now();
+        const duration = Math.round(endTime - startTime);
+        
+        const resultDiv = document.getElementById('strongHashResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h6>bcrypt Hash Result:</h6>
+                <p class="font-monospace small">${data.hash}</p>
+                <p><strong>Time taken:</strong> ${duration}ms</p>
+                <p><strong>Cost factor:</strong> ${data.cost}</p>
+                <small class="text-muted">
+                    <strong>Why this is secure:</strong> bcrypt with salt and cost factor ${data.cost}.
+                    This would take years to crack even with powerful hardware.
+                </small>
+            </div>
+        `;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('strongHashResult').innerHTML = 
+            '<div class="alert alert-danger">Error generating hash</div>';
+    });
+});
+
+document.getElementById('strongEncryptForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const data = document.getElementById('strongData').value;
+    const password = document.getElementById('encryptPassword').value;
+    
+    currentEncryptPassword = password;
+    
+    fetch('/crypto/strong_encrypt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({data: data, password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        currentEncryptedData = data.encrypted;
+        
+        const resultDiv = document.getElementById('strongEncryptResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h6>AES Encrypted Result:</h6>
+                <p class="font-monospace small">${data.encrypted}</p>
+                <p><strong>Salt:</strong> <code>${data.salt}</code></p>
+                <p><strong>Iterations:</strong> ${data.iterations.toLocaleString()}</p>
+                <small class="text-muted">
+                    <strong>Why this is secure:</strong> AES encryption with PBKDF2 key derivation,
+                    random salt, and ${data.iterations.toLocaleString()} iterations make this extremely secure.
+                </small>
+            </div>
+        `;
+        
+        // Auto-populate decryption form
+        document.getElementById('encryptedData').value = data.encrypted;
+        document.getElementById('decryptPassword').value = password;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('strongEncryptResult').innerHTML = 
+            '<div class="alert alert-danger">Error encrypting data</div>';
+    });
+});
+
+document.getElementById('keyDerivationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const password = document.getElementById('keyPassword').value;
+    const iterations = parseInt(document.getElementById('iterations').value);
+    
+    const startTime = performance.now();
+    
+    fetch('/crypto/derive_key', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password, iterations: iterations})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const endTime = performance.now();
+        const duration = Math.round(endTime - startTime);
+        
+        const resultDiv = document.getElementById('keyDerivationResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h6>PBKDF2 Key Derivation Result:</h6>
+                <p><strong>Derived Key:</strong> <code class="small">${data.key}</code></p>
+                <p><strong>Salt:</strong> <code>${data.salt}</code></p>
+                <p><strong>Iterations:</strong> ${data.iterations.toLocaleString()}</p>
+                <p><strong>Time taken:</strong> ${duration}ms</p>
+                <small class="text-muted">
+                    The derived key is cryptographically secure and suitable for encryption.
+                    Higher iterations provide better security but take more time.
+                </small>
+            </div>
+        `;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('keyDerivationResult').innerHTML = 
+            '<div class="alert alert-danger">Error deriving key</div>';
+    });
+});
+
+document.getElementById('decryptForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const encryptedData = document.getElementById('encryptedData').value;
+    const password = document.getElementById('decryptPassword').value;
+    
+    fetch('/crypto/decrypt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({encrypted: encryptedData, password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('decryptResult');
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h6>Decryption Successful:</h6>
+                    <p><strong>Original Data:</strong> ${data.decrypted}</p>
+                    <small class="text-muted">
+                        Data was successfully decrypted using the correct password.
+                        AES encryption maintains data integrity and authenticity.
+                    </small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6>Decryption Failed:</h6>
+                    <p>${data.error}</p>
+                    <small class="text-muted">
+                        This demonstrates how secure encryption protects against unauthorized access.
+                    </small>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('decryptResult').innerHTML = 
+            '<div class="alert alert-danger">Error during decryption</div>';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}SQL Injection - Insecure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE VERSION - SQL Injection Vulnerable</h4>
+            <p class="mb-0">This version concatenates user input directly into SQL queries. Try injection payloads!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Search (Vulnerable)</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="query" class="form-label">Search for users:</label>
+                        <input type="text" class="form-control" name="query" value="{{ query }}" placeholder="Enter username to search...">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+                {% if error %}
+                <div class="alert alert-danger mt-3">
+                    <strong>SQL Error:</strong> {{ error }}
+                </div>
+                {% endif %}
+
+                {% if results %}
+                <div class="mt-4">
+                    <h6>Search Results:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in results %}
+                                <tr>
+                                    <td>{{ user[0] }}</td>
+                                    <td>{{ user[1] }}</td>
+                                    <td>{{ user[2] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% elif query %}
+                <div class="alert alert-info mt-3">
+                    No users found matching "{{ query }}"
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerable Code:</h6>
+                <div class="code-block">
+                    <code>
+sql = f"SELECT username, email, role FROM users WHERE username LIKE '%{query}%'"<br>
+cursor.execute(sql)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Try These Payloads:</h6>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action" onclick="setQuery(this.dataset.payload)" data-payload="' OR '1'='1">
+                        <code>' OR '1'='1</code><br>
+                        <small class="text-muted">Returns all users</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setQuery(this.dataset.payload)" data-payload="admin'--">
+                        <code>admin'--</code><br>
+                        <small class="text-muted">Comment injection</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setQuery(this.dataset.payload)" data-payload="' UNION SELECT username, password_hash, role FROM users--">
+                        <code>' UNION SELECT username, password_hash, role FROM users--</code><br>
+                        <small class="text-muted">Extract password hashes</small>
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('sql_injection.secure') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-shield-alt"></i> See Secure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setQuery(payload) {
+    document.querySelector('input[name="query"]').value = payload;
+}
+</script>
+{% endblock %}

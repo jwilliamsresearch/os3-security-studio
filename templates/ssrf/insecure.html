@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}SSRF Insecure Demo - OS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-exclamation-triangle text-danger"></i> SSRF - Insecure URL Fetcher</h2>
+        <div class="alert alert-danger">
+            <strong>⚠️ WARNING:</strong> This version is vulnerable to SSRF attacks. Any URL will be fetched by the server!
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>URL Fetcher Tool</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="urlInput" class="form-label">Enter URL to fetch:</label>
+                    <input type="text" class="form-control" id="urlInput" placeholder="http://example.com" value="http://httpbin.org/ip">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="fetchUrl()">
+                    <i class="fas fa-download"></i> Fetch URL
+                </button>
+                <button type="button" class="btn btn-secondary ms-2" onclick="clearResponse()">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="card mt-3" id="responseCard" style="display: none;">
+            <div class="card-header">
+                <h5>Server Response</h5>
+            </div>
+            <div class="card-body">
+                <div id="responseContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Issue:</strong> No URL validation</p>
+                <p><strong>Risk:</strong> Server can be used to:</p>
+                <ul class="small">
+                    <li>Scan internal networks</li>
+                    <li>Access cloud metadata</li>
+                    <li>Bypass firewalls</li>
+                    <li>Attack internal services</li>
+                </ul>
+                
+                <h6 class="mt-3">Vulnerable Code:</h6>
+                <pre class="bg-light p-2"><code>url = request.json.get('url')
+response = requests.get(url)
+return response.text</code></pre>
+            </div>
+        </div>
+
+        <div class="card border-danger mt-3">
+            <div class="card-header bg-danger text-white">
+                <h6><i class="fas fa-skull-crossbones"></i> Attack Examples</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">Try these malicious URLs:</p>
+                <div class="attack-examples">
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://127.0.0.1:5000')">Localhost Scan</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://localhost:22')">SSH Port</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://169.254.169.254/')">AWS Metadata</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://10.0.0.1')">Private IP</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-success mt-3">
+            <div class="card-body text-center">
+                <h6>Compare with Secure Version</h6>
+                <a href="{{ url_for('ssrf.secure') }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-shield-alt"></i> View Secure Implementation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setUrl(url) {
+    document.getElementById('urlInput').value = url;
+}
+
+function clearResponse() {
+    document.getElementById('responseCard').style.display = 'none';
+    document.getElementById('responseContent').innerHTML = '';
+}
+
+async function fetchUrl() {
+    const url = document.getElementById('urlInput').value;
+    const responseCard = document.getElementById('responseCard');
+    const responseContent = document.getElementById('responseContent');
+    
+    if (!url) {
+        alert('Please enter a URL');
+        return;
+    }
+    
+    try {
+        responseContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Fetching...</div>';
+        responseCard.style.display = 'block';
+        
+        const response = await fetch('/ssrf/insecure/fetch', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            responseContent.innerHTML = `
+                <div class="alert alert-info">
+                    <strong>Status:</strong> ${data.status_code}
+                </div>
+                <h6>Response Headers:</h6>
+                <pre class="bg-light p-2 small">${JSON.stringify(data.headers, null, 2)}</pre>
+                <h6>Response Content (first 1000 chars):</h6>
+                <pre class="bg-light p-2 small" style="max-height: 300px; overflow-y: auto;">${data.content}</pre>
+                <div class="alert alert-warning mt-2">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>SSRF Success!</strong> The server fetched the URL you provided.
+                </div>
+            `;
+        } else {
+            responseContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> ${data.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        responseContent.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Network Error:</strong> ${error.message}
+            </div>
+        `;
+    }
+}
+</script>
+{% endblock %}

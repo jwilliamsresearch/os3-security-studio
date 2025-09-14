@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}Port Scanner Simulation - OS³{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-search"></i> Port Scanning</h5>
+<p><strong>What is it?</strong> Port scanning is a reconnaissance technique used to discover open ports and services on network hosts.</p>
+
+<h6>Scan Types:</h6>
+<ul>
+    <li><strong>TCP Connect:</strong> Completes full TCP handshake (most reliable)</li>
+    <li><strong>SYN Stealth:</strong> Sends SYN packets only (harder to detect)</li>
+    <li><strong>UDP Scan:</strong> Tests UDP ports (less reliable but important)</li>
+</ul>
+
+<h6>Port States:</h6>
+<ul>
+    <li><strong>Open:</strong> Service actively accepting connections</li>
+    <li><strong>Closed:</strong> Port reachable but no service listening</li>
+    <li><strong>Filtered:</strong> Firewall blocking access</li>
+</ul>
+
+<h6>Legitimate Uses:</h6>
+<ul>
+    <li>Network inventory and asset management</li>
+    <li>Security assessments and penetration testing</li>
+    <li>Troubleshooting connectivity issues</li>
+    <li>Compliance auditing</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-search"></i> Port Scanner Simulation</h2>
+        <p class="lead">Simulate network reconnaissance techniques safely in a controlled environment.</p>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Educational Simulation:</strong> This tool simulates port scanning without actually performing network operations. 
+            All results are generated for educational purposes.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> Scanner Configuration</h5>
+            </div>
+            <div class="card-body">
+                <form id="scanForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="targetIP" class="form-label">Target IP Address</label>
+                                <input type="text" class="form-control" id="targetIP" name="target_ip" 
+                                       value="192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
+                                <div class="form-text">Enter a valid IPv4 address (simulation only)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="scanType" class="form-label">Scan Type</label>
+                                <select class="form-select" id="scanType" name="scan_type">
+                                    <option value="tcp_connect">TCP Connect Scan (Basic)</option>
+                                    <option value="syn_stealth">SYN Stealth Scan (Intermediate)</option>
+                                    <option value="fin_stealth">FIN Stealth Scan (Advanced)</option>
+                                    <option value="null_stealth">NULL Stealth Scan (Advanced)</option>
+                                    <option value="xmas_stealth">XMAS Stealth Scan (Advanced)</option>
+                                    <option value="udp">UDP Scan</option>
+                                </select>
+                                <div class="form-text" id="scanTypeHelp">
+                                    <small class="text-muted">Advanced scans are harder to detect but may be less reliable</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="portRange" class="form-label">Port Range</label>
+                                <select class="form-select" id="portRange" name="port_range" onchange="toggleCustomRange()">
+                                    <option value="common">Common Ports (Top 15)</option>
+                                    <option value="1-100">Ports 1-100</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3" id="customRangeDiv" style="display: none;">
+                                <label for="customRange" class="form-label">Custom Ports</label>
+                                <input type="text" class="form-control" id="customRange" name="custom_range" 
+                                       placeholder="80-90 or 80,443,8080">
+                                <div class="form-text">Range (80-90) or comma-separated (80,443,8080)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="scanButton">
+                        <i class="fas fa-play"></i> Start Scan
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="stopScan()" id="stopButton" disabled>
+                        <i class="fas fa-stop"></i> Stop Scan
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Scan Progress -->
+        <div class="card mt-3" id="progressCard" style="display: none;">
+            <div class="card-header">
+                <h5><i class="fas fa-spinner fa-spin"></i> Scanning in Progress...</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-3">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div id="scanStatus">Initializing scan...</div>
+            </div>
+        </div>
+        
+        <!-- Scan Results -->
+        <div class="card mt-3" id="resultsCard" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-list"></i> Scan Results</h5>
+                <div id="scanSummaryBadges"></div>
+            </div>
+            <div class="card-body">
+                <div id="scanSummary" class="mb-3"></div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Port</th>
+                                <th>Status</th>
+                                <th>Service</th>
+                                <th>Banner</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Scan Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>TCP Connect Scan:</h6>
+                <ul class="small">
+                    <li>Completes full TCP handshake</li>
+                    <li>Most reliable results</li>
+                    <li>Easily logged and detected</li>
+                    <li>Slower than other methods</li>
+                </ul>
+                
+                <h6>SYN Stealth Scan:</h6>
+                <ul class="small">
+                    <li>Sends SYN, waits for response</li>
+                    <li>Doesn't complete handshake</li>
+                    <li>Harder to detect</li>
+                    <li>Faster than TCP connect</li>
+                </ul>
+                
+                <h6>UDP Scan:</h6>
+                <ul class="small">
+                    <li>Tests UDP services</li>
+                    <li>Less reliable responses</li>
+                    <li>Slower due to rate limiting</li>
+                    <li>Important for DNS, DHCP, etc.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-shield-alt"></i> Security Impact</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Risk Levels:</h6>
+                    <ul class="mb-0 small">
+                        <li><span class="badge bg-danger">High</span> - Critical services (RDP, SMB, databases)</li>
+                        <li><span class="badge bg-warning">Medium</span> - Web services, SSH</li>
+                        <li><span class="badge bg-success">Low</span> - Standard services (HTTPS, DNS)</li>
+                    </ul>
+                </div>
+                
+                <h6>What Attackers Look For:</h6>
+                <ul class="small">
+                    <li>Unpatched services</li>
+                    <li>Default configurations</li>
+                    <li>Unnecessary open ports</li>
+                    <li>Version information in banners</li>
+                    <li>Administrative interfaces</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-secret"></i> Stealth Techniques</h5>
+            </div>
+            <div class="card-body">
+                <p>Learn about advanced scanning techniques used by attackers to avoid detection.</p>
+                <a href="{{ url_for('port_scanner.stealth_techniques') }}" class="btn btn-warning">
+                    <i class="fas fa-mask"></i> Explore Stealth Scans
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-shield-alt"></i> Defense Strategies</h5>
+            </div>
+            <div class="card-body">
+                <p>Discover how to detect and prevent port scanning attacks on your network.</p>
+                <a href="{{ url_for('port_scanner.defense_measures') }}" class="btn btn-success">
+                    <i class="fas fa-shield-alt"></i> Learn Defenses
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-terminal"></i> Real Tools</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Popular scanners:</strong></p>
+                <ul class="small">
+                    <li><strong>Nmap</strong> - Network exploration tool</li>
+                    <li><strong>Masscan</strong> - High-speed port scanner</li>
+                    <li><strong>Zmap</strong> - Internet-wide scanning</li>
+                    <li><strong>Angry IP Scanner</strong> - GUI scanner</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let scanInProgress = false;
+let scanResults = [];
+
+function toggleCustomRange() {
+    const select = document.getElementById('portRange');
+    const customDiv = document.getElementById('customRangeDiv');
+    
+    if (select.value === 'custom') {
+        customDiv.style.display = 'block';
+    } else {
+        customDiv.style.display = 'none';
+    }
+}
+
+function startScan() {
+    if (scanInProgress) return;
+    
+    const form = document.getElementById('scanForm');
+    const formData = new FormData(form);
+    
+    const targetIP = formData.get('target_ip');
+    const scanType = formData.get('scan_type');
+    let portRange = formData.get('port_range');
+    
+    // Handle custom range
+    if (portRange === 'custom') {
+        const customRange = document.getElementById('customRange').value.trim();
+        if (!customRange) {
+            alert('Please specify a custom port range');
+            return;
+        }
+        portRange = customRange;
+    }
+    
+    scanInProgress = true;
+    document.getElementById('scanButton').disabled = true;
+    document.getElementById('stopButton').disabled = false;
+    document.getElementById('progressCard').style.display = 'block';
+    document.getElementById('resultsCard').style.display = 'none';
+    
+    const scanData = {
+        target_ip: targetIP,
+        scan_type: scanType,
+        port_range: portRange
+    };
+    
+    fetch('{{ url_for("port_scanner.perform_scan") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scanData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        displayResults(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred during scanning');
+    })
+    .finally(() => {
+        scanInProgress = false;
+        document.getElementById('scanButton').disabled = false;
+        document.getElementById('stopButton').disabled = true;
+        document.getElementById('progressCard').style.display = 'none';
+    });
+}
+
+function stopScan() {
+    scanInProgress = false;
+    document.getElementById('scanButton').disabled = false;
+    document.getElementById('stopButton').disabled = true;
+    document.getElementById('progressCard').style.display = 'none';
+}
+
+function displayResults(data) {
+    const resultsCard = document.getElementById('resultsCard');
+    const summaryDiv = document.getElementById('scanSummary');
+    const badgesDiv = document.getElementById('scanSummaryBadges');
+    const tableBody = document.getElementById('resultsTableBody');
+    
+    // Display summary
+    const summary = data.summary;
+    summaryDiv.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Target:</strong> ${summary.target_ip}<br>
+                <strong>Scan Type:</strong> ${summary.scan_type.replace('_', ' ').toUpperCase()}<br>
+                <strong>Duration:</strong> ${summary.scan_duration}s
+            </div>
+            <div class="col-md-6">
+                <strong>Total Ports:</strong> ${summary.total_ports}<br>
+                <strong>Timestamp:</strong> ${summary.timestamp}
+            </div>
+        </div>
+    `;
+    
+    // Display badges
+    badgesDiv.innerHTML = `
+        <span class="badge bg-success">${summary.open_ports} Open</span>
+        <span class="badge bg-danger">${summary.closed_ports} Closed</span>
+        <span class="badge bg-warning">${summary.filtered_ports} Filtered</span>
+    `;
+    
+    // Display results table
+    tableBody.innerHTML = '';
+    data.results.forEach(result => {
+        const row = document.createElement('tr');
+        
+        let statusBadge = '';
+        if (result.status === 'open') {
+            statusBadge = '<span class="badge bg-success">Open</span>';
+        } else if (result.status === 'closed') {
+            statusBadge = '<span class="badge bg-danger">Closed</span>';
+        } else {
+            statusBadge = '<span class="badge bg-warning">Filtered</span>';
+        }
+        
+        let riskBadge = '';
+        if (result.risk === 'high') {
+            riskBadge = '<span class="badge bg-danger">High</span>';
+        } else if (result.risk === 'medium') {
+            riskBadge = '<span class="badge bg-warning">Medium</span>';
+        } else if (result.risk === 'low') {
+            riskBadge = '<span class="badge bg-success">Low</span>';
+        } else {
+            riskBadge = '<span class="badge bg-secondary">Unknown</span>';
+        }
+        
+        row.innerHTML = `
+            <td>${result.port}</td>
+            <td>${statusBadge}</td>
+            <td>${result.service}</td>
+            <td><code>${result.banner}</code></td>
+            <td>${riskBadge}</td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    resultsCard.style.display = 'block';
+}
+
+// Form submission handler
+document.getElementById('scanForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    startScan();
+});
+</script>
+{% endblock %}

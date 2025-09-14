@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}CSRF Demo - Newman Cyber Lab{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-shield-alt"></i> Cross-Site Request Forgery (CSRF)</h5>
+<p><strong>What is it?</strong> CSRF tricks authenticated users into performing unintended actions by exploiting their active session.</p>
+
+<h6>How CSRF Works:</h6>
+<ol>
+    <li>User logs into vulnerable site</li>
+    <li>Attacker tricks user into visiting malicious site</li>
+    <li>Malicious site sends requests to vulnerable site</li>
+    <li>Requests execute with user's credentials</li>
+</ol>
+
+<h6>Common Attack Vectors:</h6>
+<ul>
+    <li>Hidden forms in malicious websites</li>
+    <li>Image tags with harmful URLs</li>
+    <li>AJAX requests from compromised sites</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>CSRF tokens in forms</li>
+    <li>SameSite cookie attributes</li>
+    <li>Referrer header validation</li>
+    <li>Double-submit cookie pattern</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-shield-alt"></i> Cross-Site Request Forgery (CSRF) Demonstration</h2>
+        <p class="lead">See how authenticated users can be tricked into performing unintended actions.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Insecure Version</h5>
+            </div>
+            <div class="card-body">
+                <p>This version processes requests without CSRF protection, vulnerable to forged requests.</p>
+                <div class="code-block">
+                    <code>@app.route('/transfer', methods=['POST'])<br>def transfer(): # No CSRF validation</code>
+                </div>
+                <a href="{{ url_for('csrf_insecure') }}" class="btn btn-danger">Try Insecure Version</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Secure Version</h5>
+            </div>
+            <div class="card-body">
+                <p>This version validates CSRF tokens to ensure requests originate from the legitimate site.</p>
+                <div class="code-block">
+                    <code>csrf_token = request.form.get('csrf_token')<br>validate_csrf_token(csrf_token)</code>
+                </div>
+                <a href="{{ url_for('csrf_secure') }}" class="btn btn-success">Try Secure Version</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-lightbulb"></i> CSRF Attack Simulation</h5>
+    <p>To demonstrate CSRF, you can create a malicious HTML page with this content:</p>
+    <div class="code-block">
+        <code>&lt;form action="http://localhost:5000/csrf/insecure/transfer" method="POST"&gt;<br>
+  &lt;input type="hidden" name="amount" value="1000"&gt;<br>
+  &lt;input type="hidden" name="recipient" value="attacker"&gt;<br>
+&lt;/form&gt;<br>
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;</code>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand how CSRF attacks work</li>
+        <li>Learn to implement CSRF protection</li>
+        <li>Practice secure session management</li>
+        <li>Identify vulnerable request handling</li>
+    </ul>
+</div>
+
+<div class="alert alert-primary">
+    <h5><i class="fas fa-user"></i> Login Required</h5>
+    <p class="mb-0">You need to be logged in to test CSRF functionality. Use the test accounts or create a new one.</p>
+</div>
+{% endblock %}

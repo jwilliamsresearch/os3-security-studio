@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Forensics Investigation - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-{{ scenario.icon }} text-{{ scenario.difficulty_color }}"></i> {{ scenario.title }}</h2>
+                    <p class="text-muted">{{ scenario.description }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('traffic_analysis.forensics') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Scenarios
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-{{ scenario.difficulty_color }} text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search"></i> Investigation Workspace
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Case Status:</strong> {{ investigation.status }} | 
+                        <strong>Progress:</strong> {{ investigation.progress }}% | 
+                        <strong>Evidence Collected:</strong> {{ investigation.evidence_count }}/{{ investigation.total_evidence }}
+                    </div>
+
+                    <div class="progress mb-3">
+                        <div class="progress-bar bg-{{ scenario.difficulty_color }}" style="width: {{ investigation.progress }}%">
+                            {{ investigation.progress }}% Complete
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Timeline Analysis:</h6>
+                            <div class="timeline-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px;">
+                                {% for event in timeline_events %}
+                                <div class="timeline-event mb-2">
+                                    <div class="d-flex">
+                                        <div class="me-2">
+                                            <span class="badge bg-{{ event.severity_color }}">{{ event.timestamp }}</span>
+                                        </div>
+                                        <div>
+                                            <strong>{{ event.event_type }}</strong><br>
+                                            <small>{{ event.description }}</small><br>
+                                            <small class="text-muted">Source: {{ event.source }} → {{ event.destination }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Network Map:</h6>
+                            <div class="network-map bg-light p-3 rounded" style="height: 300px;">
+                                <div class="text-center">
+                                    <div class="network-diagram">
+                                        {% for node in network_nodes %}
+                                        <div class="network-node {{ node.type }}" style="margin: 10px;">
+                                            <i class="fas fa-{{ node.icon }} text-{{ node.color }}"></i>
+                                            <br><small>{{ node.label }}</small>
+                                            {% if node.compromised %}
+                                            <br><span class="badge bg-danger">COMPROMISED</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Evidence Analysis:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Source</th>
+                                        <th>Evidence</th>
+                                        <th>Confidence</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evidence in evidence_items %}
+                                    <tr>
+                                        <td><small>{{ evidence.timestamp }}</small></td>
+                                        <td><span class="badge bg-{{ evidence.type_color }}">{{ evidence.type }}</span></td>
+                                        <td><code>{{ evidence.source }}</code></td>
+                                        <td class="small">{{ evidence.description }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 15px; width: 60px;">
+                                                <div class="progress-bar bg-{{ evidence.confidence_color }}" style="width: {{ evidence.confidence }}%">
+                                                    {{ evidence.confidence }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="analyzeEvidence('{{ evidence.id }}')">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-tasks"></i> Investigation Checklist</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Objectives:</h6>
+                    <ul class="list-unstyled">
+                        {% for objective in scenario.objectives %}
+                        <li class="mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="obj{{ loop.index }}" 
+                                       {{ 'checked' if objective.completed else '' }}>
+                                <label class="form-check-label small" for="obj{{ loop.index }}">
+                                    {{ objective.description }}
+                                </label>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Tools Available:</h6>
+                    <ul class="list-unstyled small">
+                        {% for tool in available_tools %}
+                        <li class="mb-1">
+                            <button class="btn btn-sm btn-outline-secondary w-100" onclick="useTool('{{ tool.name }}')">
+                                <i class="fas fa-{{ tool.icon }}"></i> {{ tool.name }}
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-lightbulb"></i> Investigation Notes</h6>
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control" rows="8" placeholder="Record your findings and hypotheses here...">{{ investigation_notes }}</textarea>
+                    <button class="btn btn-primary btn-sm mt-2 w-100" onclick="saveNotes()">
+                        <i class="fas fa-save"></i> Save Notes
+                    </button>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-pie"></i> Attack Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Indicators of Compromise:</h6>
+                    <ul class="small list-unstyled">
+                        {% for ioc in indicators_of_compromise %}
+                        <li class="mb-1">
+                            <i class="fas fa-{{ ioc.icon }} text-{{ ioc.color }}"></i>
+                            {{ ioc.type }}: <code>{{ ioc.value }}</code>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Attack Vector:</h6>
+                    <div class="text-center">
+                        <div class="display-6 text-{{ attack_analysis.vector_color }}">
+                            {{ attack_analysis.vector_confidence }}%
+                        </div>
+                        <small class="text-muted">{{ attack_analysis.vector_type }}</small>
+                    </div>
+
+                    <h6 class="mt-3">Threat Actor Profile:</h6>
+                    <ul class="small list-unstyled">
+                        <li><strong>Sophistication:</strong> {{ threat_actor.sophistication }}</li>
+                        <li><strong>Motivation:</strong> {{ threat_actor.motivation }}</li>
+                        <li><strong>Attribution:</strong> {{ threat_actor.attribution }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-file-alt"></i> Generate Report</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small">Complete the investigation to generate a comprehensive forensics report.</p>
+                    <button class="btn btn-success w-100" onclick="generateReport()" 
+                            {{ 'disabled' if investigation.progress < 80 else '' }}>
+                        <i class="fas fa-file-pdf"></i> Generate Report
+                    </button>
+                    {% if investigation.progress < 80 %}
+                    <small class="text-muted d-block mt-1">Requires 80% completion</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-graduation-cap"></i> Forensics Methodology:</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>1. Identification:</h6>
+                        <ul class="small mb-0">
+                            <li>Incident detection</li>
+                            <li>Scope determination</li>
+                            <li>Evidence sources</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>2. Preservation:</h6>
+                        <ul class="small mb-0">
+                            <li>Evidence isolation</li>
+                            <li>Chain of custody</li>
+                            <li>Data integrity</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>3. Analysis:</h6>
+                        <ul class="small mb-0">
+                            <li>Timeline reconstruction</li>
+                            <li>Artifact correlation</li>
+                            <li>Attack attribution</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>4. Presentation:</h6>
+                        <ul class="small mb-0">
+                            <li>Report generation</li>
+                            <li>Legal documentation</li>
+                            <li>Recommendations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function analyzeEvidence(evidenceId) {
+    alert('Analyzing evidence ID: ' + evidenceId + '\n\nIn a real forensics tool, this would open detailed evidence analysis capabilities.');
+}
+
+function useTool(toolName) {
+    alert('Using forensics tool: ' + toolName + '\n\nIn a real investigation environment, this would launch the selected analysis tool.');
+}
+
+function saveNotes() {
+    const notes = document.querySelector('textarea').value;
+    alert('Notes saved successfully!\n\nIn a real system, investigation notes would be securely stored with the case file.');
+}
+
+function generateReport() {
+    alert('Generating comprehensive forensics report...\n\nIn a real system, this would create a detailed incident response report with timeline, evidence, and recommendations.');
+}
+
+// Simulate real-time investigation updates
+function updateInvestigation() {
+    console.log('Updating forensics investigation data...');
+}
+
+setInterval(updateInvestigation, 5000);
+</script>
+{% endblock %}

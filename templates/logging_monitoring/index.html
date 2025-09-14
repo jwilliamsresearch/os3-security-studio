@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Security Logging & Monitoring Demo - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-clipboard-list"></i> Security Logging and Monitoring Failures</h5>
+<p><strong>What is it?</strong> Insufficient logging, monitoring, and incident response that prevent organizations from detecting and responding to breaches.</p>
+
+<h6>Common Problems:</h6>
+<ul>
+    <li><strong>Missing Security Logs:</strong> Login attempts, access control failures not logged</li>
+    <li><strong>Inadequate Monitoring:</strong> No real-time alerting or anomaly detection</li>
+    <li><strong>Poor Log Management:</strong> Logs not centralized, searchable, or retained</li>
+    <li><strong>No Incident Response:</strong> Lack of response procedures and tools</li>
+</ul>
+
+<h6>Best Practices:</h6>
+<ul>
+    <li>Log all security-relevant events</li>
+    <li>Implement real-time monitoring and alerting</li>
+    <li>Centralize log management (SIEM)</li>
+    <li>Regular log analysis and threat hunting</li>
+    <li>Incident response procedures</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-clipboard-list"></i> Security Logging and Monitoring Failures</h2>
+        <p class="lead">Compare inadequate vs comprehensive security logging and monitoring capabilities.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Inadequate Logging</h5>
+            </div>
+            <div class="card-body">
+                <p>Demonstrates poor logging practices that miss security incidents:</p>
+                <div class="code-block">
+                    <code># No security event logging<br>
+logger.error("Error occurred")  # Generic<br>
+# Failed logins not tracked<br>
+# No attack pattern detection</code>
+                </div>
+                <a href="{{ url_for('logging_monitoring.insecure_logging') }}" class="btn btn-danger">See Poor Logging</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Comprehensive Monitoring</h5>
+            </div>
+            <div class="card-body">
+                <p>Shows proper security logging, monitoring, and incident response:</p>
+                <div class="code-block">
+                    <code># Detailed security logging<br>
+security_logger.warning("ATTACK", extra=context)<br>
+# Real-time anomaly detection<br>
+# Automated alerting and response</code>
+                </div>
+                <a href="{{ url_for('logging_monitoring.secure_logging') }}" class="btn btn-success">See Secure Monitoring</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> OWASP Top 10 2021: A09 - Security Logging and Monitoring Failures</h5>
+    <p>This vulnerability category covers the lack of security logging, monitoring, and incident response. Key issues include:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Logging Failures:</strong></p>
+            <ul class="mb-0">
+                <li>Auditable events not logged</li>
+                <li>Warnings and errors generate inadequate logs</li>
+                <li>Logs stored locally only</li>
+                <li>No log integrity protection</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Monitoring Failures:</strong></p>
+            <ul class="mb-0">
+                <li>No real-time monitoring</li>
+                <li>No automated alerting</li>
+                <li>Penetration testing undetected</li>
+                <li>Slow incident response</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-eye"></i> Security Monitoring Dashboard</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Security Events</h5>
+                                <h2 class="text-primary" id="totalEvents">0</h2>
+                                <small class="text-muted">Total incidents logged</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Recent Attacks</h5>
+                                <h2 class="text-warning" id="recentAttacks">0</h2>
+                                <small class="text-muted">Last hour</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Active Alerts</h5>
+                                <h2 class="text-danger" id="activeAlerts">0</h2>
+                                <small class="text-muted">Requires attention</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">System Status</h5>
+                                <h2 class="text-success" id="systemStatus">✓</h2>
+                                <small class="text-muted">Monitoring active</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6>Recent Security Logs:</h6>
+                    <div id="recentLogs" class="bg-dark text-light p-3 rounded" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em;">
+                        <div class="text-muted">Security monitoring dashboard loading...</div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-info" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh Dashboard
+                    </button>
+                    <button class="btn btn-warning" onclick="detectAnomalies()">
+                        <i class="fas fa-search"></i> Detect Anomalies
+                    </button>
+                    <button class="btn btn-danger" onclick="generateAlert()">
+                        <i class="fas fa-exclamation-triangle"></i> Generate Alert
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> Proper Logging Elements</h5>
+            </div>
+            <div class="card-body">
+                <h6>What to Log:</h6>
+                <ul>
+                    <li><strong>Authentication events:</strong> Login, logout, failed attempts</li>
+                    <li><strong>Authorization failures:</strong> Access denied events</li>
+                    <li><strong>Input validation failures:</strong> Malformed requests</li>
+                    <li><strong>Application errors:</strong> Exceptions and failures</li>
+                    <li><strong>Administrative changes:</strong> Configuration updates</li>
+                </ul>
+                
+                <h6 class="mt-3">Log Format:</h6>
+                <div class="code-block">
+                    <code>timestamp | level | event | user | ip | details</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-tools"></i> Monitoring Tools</h5>
+            </div>
+            <div class="card-body">
+                <h6>SIEM Solutions:</h6>
+                <ul>
+                    <li><strong>ELK Stack:</strong> Elasticsearch, Logstash, Kibana</li>
+                    <li><strong>Splunk:</strong> Enterprise security monitoring</li>
+                    <li><strong>QRadar:</strong> IBM security intelligence</li>
+                    <li><strong>ArcSight:</strong> Micro Focus SIEM</li>
+                </ul>
+                
+                <h6 class="mt-3">Open Source Tools:</h6>
+                <ul class="mb-0">
+                    <li><strong>OSSEC:</strong> Host-based intrusion detection</li>
+                    <li><strong>Suricata:</strong> Network monitoring</li>
+                    <li><strong>Graylog:</strong> Centralized log management</li>
+                    <li><strong>Wazuh:</strong> Security monitoring platform</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <h5><i class="fas fa-lightbulb"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand the importance of security logging and monitoring</li>
+        <li>Learn what events should be logged for security purposes</li>
+        <li>Practice implementing comprehensive logging strategies</li>
+        <li>Explore real-time monitoring and alerting capabilities</li>
+        <li>Develop incident response and threat hunting skills</li>
+    </ul>
+</div>
+
+<script>
+let dashboardInterval;
+
+function refreshDashboard() {
+    fetch('/logging_monitoring/get_security_logs')
+    .then(response => response.json())
+    .then(data => {
+        // Update statistics
+        document.getElementById('totalEvents').textContent = data.statistics.total_incidents;
+        document.getElementById('recentAttacks').textContent = data.statistics.recent_incidents;
+        
+        // Update recent logs
+        const logsDiv = document.getElementById('recentLogs');
+        let logsHtml = '';
+        
+        if (data.logs.length === 0) {
+            logsHtml = '<div class="text-muted">No security events logged yet. Try the demonstrations below.</div>';
+        } else {
+            data.logs.reverse().forEach(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                const severityColor = getSeverityColor(log.severity);
+                logsHtml += `
+                    <div class="mb-1">
+                        <span class="text-${severityColor}">[${log.severity.toUpperCase()}]</span>
+                        <span class="text-light">${timestamp}</span> - 
+                        <span class="text-warning">${log.attack_type}</span> from 
+                        <span class="text-info">${log.source_ip}</span>
+                        <br><span class="text-muted ml-4">${log.details}</span>
+                    </div>
+                `;
+            });
+        }
+        
+        logsDiv.innerHTML = logsHtml;
+        logsDiv.scrollTop = logsDiv.scrollHeight;
+        
+        // Update last refresh time
+        console.log('Dashboard refreshed at', data.timestamp);
+    })
+    .catch(error => {
+        console.error('Error refreshing dashboard:', error);
+        document.getElementById('recentLogs').innerHTML = 
+            '<div class="text-danger">Error loading security logs</div>';
+    });
+}
+
+function detectAnomalies() {
+    fetch('/logging_monitoring/detect_anomalies', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({type: 'suspicious_patterns'})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const logsDiv = document.getElementById('recentLogs');
+        let anomalyHtml = '<div class="text-info">[ANOMALY DETECTION]</div>';
+        
+        if (data.anomalies.length === 0) {
+            anomalyHtml += '<div class="text-success">No anomalies detected in recent activity</div>';
+        } else {
+            data.anomalies.forEach(anomaly => {
+                const severityColor = getSeverityColor(anomaly.severity);
+                anomalyHtml += `
+                    <div class="text-${severityColor}">
+                        [${anomaly.severity.toUpperCase()}] ${anomaly.type}: ${anomaly.description}
+                    </div>
+                `;
+            });
+        }
+        
+        logsDiv.innerHTML = anomalyHtml + '<hr>' + logsDiv.innerHTML;
+        document.getElementById('activeAlerts').textContent = data.anomalies.length;
+    })
+    .catch(error => {
+        console.error('Error detecting anomalies:', error);
+    });
+}
+
+function generateAlert() {
+    fetch('/logging_monitoring/generate_alert', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({alert_type: 'critical_incident'})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const logsDiv = document.getElementById('recentLogs');
+        const alert = data.alert;
+        
+        const alertHtml = `
+            <div class="text-danger">
+                [SECURITY ALERT] ${alert.id}<br>
+                <strong>${alert.title}</strong><br>
+                ${alert.description}<br>
+                Severity: ${alert.severity.toUpperCase()}<br>
+                Recommended Actions: ${alert.recommended_actions.join(', ')}
+            </div>
+            <hr>
+        `;
+        
+        logsDiv.innerHTML = alertHtml + logsDiv.innerHTML;
+        document.getElementById('activeAlerts').textContent = 
+            parseInt(document.getElementById('activeAlerts').textContent) + 1;
+    })
+    .catch(error => {
+        console.error('Error generating alert:', error);
+    });
+}
+
+function getSeverityColor(severity) {
+    const colors = {
+        'critical': 'danger',
+        'high': 'warning',
+        'medium': 'info',
+        'low': 'secondary'
+    };
+    return colors[severity] || 'light';
+}
+
+// Auto-refresh dashboard every 30 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    refreshDashboard();
+    dashboardInterval = setInterval(refreshDashboard, 30000);
+});
+
+// Clean up interval when page unloads
+window.addEventListener('beforeunload', function() {
+    if (dashboardInterval) {
+        clearInterval(dashboardInterval);
+    }
+});
+</script>
+{% endblock %}

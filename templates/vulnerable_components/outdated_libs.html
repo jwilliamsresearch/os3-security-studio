@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Outdated Libraries - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-exclamation-triangle text-warning"></i> Dependency Vulnerabilities</h5>
+<p><strong>Security Risk:</strong> Using outdated libraries with known CVEs exposes applications to exploitation.</p>
+
+<h6>Common Vulnerable Libraries:</h6>
+<ul>
+    <li><strong>requests 2.19.1:</strong> CVE-2018-18074 (Redirect handling)</li>
+    <li><strong>PyYAML 3.12:</strong> CVE-2017-18342 (Code execution)</li>
+    <li><strong>Django 1.11.0:</strong> CVE-2017-7233 (Open redirect)</li>
+    <li><strong>Flask 0.12.0:</strong> CVE-2018-1000656 (Input validation)</li>
+</ul>
+
+<h6>Mitigation:</h6>
+<ul>
+    <li>Regular dependency audits</li>
+    <li>Automated vulnerability scanning</li>
+    <li>Timely security updates</li>
+    <li>Use of dependency management tools</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <h4><i class="fas fa-exclamation-triangle"></i> Outdated Dependencies Warning</h4>
+            <p>This demonstration shows how <strong>vulnerable dependencies</strong> can expose applications to known security exploits.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-warning mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-search"></i> Vulnerability Scanner</h5>
+            </div>
+            <div class="card-body">
+                <p>Check if a package version has known vulnerabilities:</p>
+                <form id="vulnerabilityForm">
+                    <div class="mb-3">
+                        <label for="packageName" class="form-label">Package Name:</label>
+                        <select class="form-control" id="packageName">
+                            <option value="requests">requests</option>
+                            <option value="pyyaml">PyYAML</option>
+                            <option value="django">Django</option>
+                            <option value="flask">Flask</option>
+                            <option value="custom">Custom package...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="packageVersion" class="form-label">Version:</label>
+                        <input type="text" class="form-control" id="packageVersion" placeholder="e.g., 2.19.1" value="2.19.1">
+                    </div>
+                    <button type="submit" class="btn btn-warning">Check for Vulnerabilities</button>
+                </form>
+                <div id="vulnerabilityResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-list"></i> Package Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Get information about installed packages:</p>
+                <form id="packageInfoForm">
+                    <div class="mb-3">
+                        <label for="infoPackageName" class="form-label">Package Name:</label>
+                        <input type="text" class="form-control" id="infoPackageName" placeholder="e.g., requests" value="requests">
+                    </div>
+                    <button type="submit" class="btn btn-info">Get Package Info</button>
+                </form>
+                <div id="packageInfoResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-bug"></i> Known Vulnerabilities Database</h5>
+            </div>
+            <div class="card-body">
+                <div id="vulnerabilityDatabase">
+                    <p>Loading vulnerability database...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Security Best Practices</h5>
+            </div>
+            <div class="card-body">
+                <h6>Dependency Management:</h6>
+                <ul>
+                    <li><strong>Use version pinning:</strong> Specify exact versions</li>
+                    <li><strong>Regular audits:</strong> Check for vulnerabilities weekly</li>
+                    <li><strong>Automated scanning:</strong> Integrate security tools in CI/CD</li>
+                    <li><strong>Update strategy:</strong> Plan and test updates</li>
+                </ul>
+                
+                <h6 class="mt-3">Recommended Tools:</h6>
+                <ul class="mb-0">
+                    <li><code>pip-audit</code> - Python dependency scanner</li>
+                    <li><code>safety</code> - Check Python dependencies</li>
+                    <li><code>snyk</code> - Multi-language vulnerability scanner</li>
+                    <li><code>OWASP Dependency-Check</code> - Open source scanner</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-terminal"></i> Example Commands</h5>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerability Scanning:</h6>
+                <div class="code-block">
+                    <code># Install security tools<br>
+pip install safety pip-audit<br><br>
+# Scan for vulnerabilities<br>
+safety check<br>
+pip-audit<br><br>
+# Generate security report<br>
+safety check --json > security-report.json</code>
+                </div>
+                
+                <h6 class="mt-3">Requirements Management:</h6>
+                <div class="code-block">
+                    <code># Pin exact versions<br>
+pip freeze > requirements.txt<br><br>
+# Update dependencies<br>
+pip list --outdated<br>
+pip install -U package_name</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('vulnerable_components.insecure_deserialization') }}" class="btn btn-danger btn-lg">
+            <i class="fas fa-bomb"></i> Try Insecure Deserialization
+        </a>
+        <a href="{{ url_for('vulnerable_components.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+// Known vulnerabilities database
+const vulnerabilityDatabase = {
+    'requests': [
+        {version: '2.19.1', cve: 'CVE-2018-18074', severity: 'Medium', description: 'Improper handling of redirects'},
+        {version: '2.8.1', cve: 'CVE-2015-2296', severity: 'High', description: 'Certificate verification bypass'}
+    ],
+    'pyyaml': [
+        {version: '3.12', cve: 'CVE-2017-18342', severity: 'Critical', description: 'Arbitrary code execution via unsafe yaml.load()'},
+        {version: '5.3', cve: 'CVE-2020-1747', severity: 'High', description: 'Arbitrary code execution'}
+    ],
+    'django': [
+        {version: '1.11.0', cve: 'CVE-2017-7233', severity: 'Medium', description: 'Open redirect vulnerability'},
+        {version: '2.2.0', cve: 'CVE-2019-14232', severity: 'High', description: 'Denial of service via truncated emails'}
+    ],
+    'flask': [
+        {version: '0.12.0', cve: 'CVE-2018-1000656', severity: 'High', description: 'Improper input validation'}
+    ]
+};
+
+// Display vulnerability database
+function displayVulnerabilityDatabase() {
+    const dbDiv = document.getElementById('vulnerabilityDatabase');
+    let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Package</th><th>Version</th><th>CVE</th><th>Severity</th><th>Description</th></tr></thead><tbody>';
+    
+    for (const [package, vulnerabilities] of Object.entries(vulnerabilityDatabase)) {
+        vulnerabilities.forEach(vuln => {
+            const severityClass = {
+                'Critical': 'table-danger',
+                'High': 'table-warning',
+                'Medium': 'table-info'
+            }[vuln.severity] || '';
+            
+            html += `
+                <tr class="${severityClass}">
+                    <td><code>${package}</code></td>
+                    <td><code>${vuln.version}</code></td>
+                    <td><a href="https://nvd.nist.gov/vuln/detail/${vuln.cve}" target="_blank">${vuln.cve}</a></td>
+                    <td><span class="badge bg-${getSeverityColor(vuln.severity)}">${vuln.severity}</span></td>
+                    <td>${vuln.description}</td>
+                </tr>
+            `;
+        });
+    }
+    
+    html += '</tbody></table></div>';
+    dbDiv.innerHTML = html;
+}
+
+function getSeverityColor(severity) {
+    const colors = {
+        'Critical': 'danger',
+        'High': 'warning',
+        'Medium': 'info',
+        'Low': 'secondary'
+    };
+    return colors[severity] || 'secondary';
+}
+
+// Package name suggestions
+document.getElementById('packageName').addEventListener('change', function() {
+    const package = this.value;
+    const versionInput = document.getElementById('packageVersion');
+    
+    const suggestions = {
+        'requests': '2.19.1',
+        'pyyaml': '3.12',
+        'django': '1.11.0',
+        'flask': '0.12.0'
+    };
+    
+    if (suggestions[package]) {
+        versionInput.value = suggestions[package];
+    }
+});
+
+// Vulnerability form
+document.getElementById('vulnerabilityForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const packageName = document.getElementById('packageName').value;
+    const version = document.getElementById('packageVersion').value;
+    
+    fetch('/vulnerable_components/check_vulnerability', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            package: packageName,
+            version: version
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('vulnerabilityResult');
+        
+        if (data.vulnerable) {
+            const vuln = data.vulnerability;
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Vulnerability Found!</h6>
+                    <p><strong>Package:</strong> ${data.package} ${data.version}</p>
+                    <p><strong>CVE:</strong> <a href="https://nvd.nist.gov/vuln/detail/${vuln.cve}" target="_blank">${vuln.cve}</a></p>
+                    <p><strong>Severity:</strong> <span class="badge bg-${getSeverityColor(vuln.severity)}">${vuln.severity}</span></p>
+                    <p><strong>Description:</strong> ${vuln.description}</p>
+                    <p><strong>Fixed in:</strong> ${vuln.fixed_in}</p>
+                    <small class="text-muted">Recommendation: Update to version ${vuln.fixed_in} or later</small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-check-circle"></i> No Known Vulnerabilities</h6>
+                    <p><strong>Package:</strong> ${data.package} ${data.version}</p>
+                    <p>This version does not have any known vulnerabilities in our database.</p>
+                    <small class="text-muted">Note: Always check the latest security advisories</small>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('vulnerabilityResult').innerHTML = 
+            '<div class="alert alert-danger">Error checking vulnerability</div>';
+    });
+});
+
+// Package info form
+document.getElementById('packageInfoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const packageName = document.getElementById('infoPackageName').value;
+    
+    fetch('/vulnerable_components/package_info', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({package: packageName})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('packageInfoResult');
+        
+        if (data.found) {
+            const info = data.info;
+            const today = new Date();
+            const lastUpdate = new Date(info.last_updated);
+            const daysDiff = Math.floor((today - lastUpdate) / (1000 * 60 * 60 * 24));
+            
+            let ageClass = 'success';
+            if (daysDiff > 365) ageClass = 'danger';
+            else if (daysDiff > 180) ageClass = 'warning';
+            
+            resultDiv.innerHTML = `
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-package"></i> Package Information</h6>
+                    <p><strong>Package:</strong> ${data.package}</p>
+                    <p><strong>Version:</strong> ${info.version}</p>
+                    <p><strong>Last Updated:</strong> ${info.last_updated} 
+                        <span class="badge bg-${ageClass}">${daysDiff} days ago</span>
+                    </p>
+                    ${daysDiff > 365 ? '<p class="text-danger"><i class="fas fa-exclamation-triangle"></i> This package is very outdated and may contain vulnerabilities!</p>' : ''}
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-question-circle"></i> Package Not Found</h6>
+                    <p><strong>Package:</strong> ${data.package}</p>
+                    <p>${data.message}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('packageInfoResult').innerHTML = 
+            '<div class="alert alert-danger">Error getting package information</div>';
+    });
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    displayVulnerabilityDatabase();
+});
+</script>
+{% endblock %}

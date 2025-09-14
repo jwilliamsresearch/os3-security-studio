@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Access Control - Secure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE VERSION - Access Control Protected</h4>
+            <p class="mb-0">This profile page validates that users can only access their own data.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-shield"></i> Your Profile (Protected)</h5>
+            </div>
+            <div class="card-body">
+                {% if user %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Your Profile Information:</h6>
+                        <table class="table">
+                            <tr>
+                                <th>Username:</th>
+                                <td>{{ user[0] }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ user[1] }}</td>
+                            </tr>
+                            <tr>
+                                <th>Account Balance:</th>
+                                <td>${{ "%.2f"|format(user[2]) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-shield-alt"></i> Security Enforced</h6>
+                            <p>You are viewing your own profile (User ID: <strong>{{ user_id }}</strong>)</p>
+                            <p class="mb-0">Access control prevents viewing other users' data.</p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <p class="mb-0">Access denied! You can only view your own profile.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Secure Code:</h6>
+                <div class="code-block">
+                    <code>
+@app.route('/profile/&lt;int:user_id&gt;')<br>
+@login_required<br>
+def profile(user_id):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if session['user_id'] != user_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;flash('Access denied!')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return redirect(...)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user = get_user(user_id)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return render_template('profile.html', user=user)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Protection Methods:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> User identity validation</li>
+                    <li><i class="fas fa-check text-success"></i> Session verification</li>
+                    <li><i class="fas fa-check text-success"></i> Authorization check</li>
+                    <li><i class="fas fa-check text-success"></i> Access denial on mismatch</li>
+                </ul>
+
+                <h6 class="mt-3">Test Access Control:</h6>
+                <p class="small">Try to access other profiles - you'll be denied!</p>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('access_control.secure', user_id=1) }}" class="list-group-item list-group-item-action {% if session.user_id == 1 %}list-group-item-success{% else %}list-group-item-danger{% endif %}">
+                        <strong>User ID: 1</strong><br>
+                        <small class="text-muted">{% if session.user_id == 1 %}Your account{% else %}Access denied{% endif %}</small>
+                    </a>
+                    <a href="{{ url_for('access_control.secure', user_id=2) }}" class="list-group-item list-group-item-action {% if session.user_id == 2 %}list-group-item-success{% else %}list-group-item-danger{% endif %}">
+                        <strong>User ID: 2</strong><br>
+                        <small class="text-muted">{% if session.user_id == 2 %}Your account{% else %}Access denied{% endif %}</small>
+                    </a>
+                </div>
+
+                <h6 class="mt-3">Current Session:</h6>
+                <div class="code-block">
+                    <small>
+                        <code>
+User ID: {{ session.user_id }}<br>
+Username: {{ session.username }}
+                        </code>
+                    </small>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('access_control.insecure', user_id=user_id) }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

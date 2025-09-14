@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Packet Capture Simulation - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-capture text-primary"></i> Network Packet Capture Simulation</h2>
+                    <p class="text-muted">Educational network traffic analysis and packet inspection</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('traffic_analysis.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Traffic Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-network-wired"></i> Live Packet Capture
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Educational Simulation:</strong> This simulates packet capture for learning purposes only.
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Capture Settings:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Interface:</strong> eth0 (simulated)</li>
+                                <li><strong>Filter:</strong> All packets</li>
+                                <li><strong>Duration:</strong> Continuous</li>
+                                <li><strong>Buffer Size:</strong> 64MB</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Capture Statistics:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Packets Captured:</strong> <span id="packet-count">0</span></li>
+                                <li><strong>Data Volume:</strong> <span id="data-volume">0 KB</span></li>
+                                <li><strong>Capture Rate:</strong> <span id="capture-rate">0 pps</span></li>
+                                <li><strong>Status:</strong> <span class="badge bg-success">ACTIVE</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" id="start-capture">
+                                    <i class="fas fa-play"></i> Start Capture
+                                </button>
+                                <button type="button" class="btn btn-danger" id="stop-capture">
+                                    <i class="fas fa-stop"></i> Stop Capture
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clear-capture">
+                                    <i class="fas fa-trash"></i> Clear Buffer
+                                </button>
+                                <button type="button" class="btn btn-info" id="export-capture">
+                                    <i class="fas fa-download"></i> Export PCAP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="packet-display">
+                        <h6>Captured Packets:</h6>
+                        <div class="bg-dark text-light p-3 rounded" style="height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.85em;" id="packet-stream">
+                            <div class="text-muted">Waiting for packets...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-filter"></i> Packet Filters</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Protocol Filter:</label>
+                        <select class="form-select" id="protocol-filter">
+                            <option value="all">All Protocols</option>
+                            <option value="tcp">TCP Only</option>
+                            <option value="udp">UDP Only</option>
+                            <option value="icmp">ICMP Only</option>
+                            <option value="http">HTTP Traffic</option>
+                            <option value="https">HTTPS Traffic</option>
+                            <option value="dns">DNS Queries</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Port Filter:</label>
+                        <input type="text" class="form-control" id="port-filter" placeholder="80,443,53">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">IP Address:</label>
+                        <input type="text" class="form-control" id="ip-filter" placeholder="192.168.1.100">
+                    </div>
+
+                    <button class="btn btn-primary w-100" id="apply-filters">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-pie"></i> Traffic Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Protocol Distribution:</h6>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>TCP:</span>
+                            <span class="badge bg-primary" id="tcp-percentage">0%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" id="tcp-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>UDP:</span>
+                            <span class="badge bg-success" id="udp-percentage">0%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" id="udp-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>ICMP:</span>
+                            <span class="badge bg-warning" id="icmp-percentage">0%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" id="icmp-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>Other:</span>
+                            <span class="badge bg-secondary" id="other-percentage">0%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-secondary" id="other-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-3">Top Applications:</h6>
+                    <ul class="list-unstyled small" id="top-applications">
+                        <li>HTTP: <span class="float-end">0 packets</span></li>
+                        <li>HTTPS: <span class="float-end">0 packets</span></li>
+                        <li>DNS: <span class="float-end">0 packets</span></li>
+                        <li>SSH: <span class="float-end">0 packets</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Anomaly Detection</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Security Alerts:</h6>
+                    <div id="security-alerts" class="small">
+                        <div class="text-muted">No anomalies detected</div>
+                    </div>
+
+                    <h6 class="mt-3">Traffic Patterns:</h6>
+                    <ul class="list-unstyled small">
+                        <li id="pattern-normal">Normal: <span class="badge bg-success">OK</span></li>
+                        <li id="pattern-suspicious">Suspicious: <span class="badge bg-warning">0</span></li>
+                        <li id="pattern-malicious">Malicious: <span class="badge bg-danger">0</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Notes:</h6>
+                <ul class="mb-0">
+                    <li><strong>Packet Capture:</strong> The process of intercepting and logging network traffic for analysis and troubleshooting.</li>
+                    <li><strong>Protocol Analysis:</strong> Examining different network protocols to understand communication patterns and identify issues.</li>
+                    <li><strong>Anomaly Detection:</strong> Identifying unusual network behavior that may indicate security threats or performance issues.</li>
+                    <li><strong>Real-world Tools:</strong> Wireshark, tcpdump, and network monitoring solutions use similar techniques for traffic analysis.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let captureActive = false;
+let packetCount = 0;
+let dataVolume = 0;
+let protocolStats = { tcp: 0, udp: 0, icmp: 0, other: 0 };
+
+// Simulated packet data
+const packetTemplates = [
+    { protocol: 'TCP', src: '192.168.1.100', dst: '93.184.216.34', sport: '54321', dport: '80', size: 1460, info: 'HTTP GET request' },
+    { protocol: 'UDP', src: '192.168.1.100', dst: '8.8.8.8', sport: '53842', dport: '53', size: 45, info: 'DNS query example.com' },
+    { protocol: 'TCP', src: '93.184.216.34', dst: '192.168.1.100', sport: '80', dport: '54321', size: 1460, info: 'HTTP response' },
+    { protocol: 'ICMP', src: '192.168.1.100', dst: '8.8.8.8', sport: '-', dport: '-', size: 64, info: 'Echo request' },
+    { protocol: 'TCP', src: '192.168.1.100', dst: '142.250.184.14', sport: '54322', dport: '443', size: 1460, info: 'HTTPS data' }
+];
+
+function generatePacket() {
+    const template = packetTemplates[Math.floor(Math.random() * packetTemplates.length)];
+    const timestamp = new Date().toISOString().slice(11, 23);
+    
+    packetCount++;
+    dataVolume += template.size;
+    
+    // Update protocol stats
+    const proto = template.protocol.toLowerCase();
+    if (protocolStats.hasOwnProperty(proto)) {
+        protocolStats[proto]++;
+    } else {
+        protocolStats.other++;
+    }
+    
+    const packetLine = `${timestamp} ${template.protocol.padEnd(5)} ${template.src.padEnd(15)} -> ${template.dst.padEnd(15)} [${template.sport}:${template.dport}] ${template.size} bytes - ${template.info}`;
+    
+    const packetStream = document.getElementById('packet-stream');
+    const packetDiv = document.createElement('div');
+    packetDiv.className = 'text-light mb-1';
+    packetDiv.textContent = packetLine;
+    
+    // Color code by protocol
+    switch(template.protocol) {
+        case 'TCP': packetDiv.className += ' text-info'; break;
+        case 'UDP': packetDiv.className += ' text-success'; break;
+        case 'ICMP': packetDiv.className += ' text-warning'; break;
+        default: packetDiv.className += ' text-secondary'; break;
+    }
+    
+    packetStream.appendChild(packetDiv);
+    packetStream.scrollTop = packetStream.scrollHeight;
+    
+    // Keep only last 100 packets
+    while (packetStream.children.length > 100) {
+        packetStream.removeChild(packetStream.firstChild);
+    }
+    
+    updateStats();
+}
+
+function updateStats() {
+    document.getElementById('packet-count').textContent = packetCount;
+    document.getElementById('data-volume').textContent = (dataVolume / 1024).toFixed(1) + ' KB';
+    document.getElementById('capture-rate').textContent = Math.floor(Math.random() * 50 + 10) + ' pps';
+    
+    // Update protocol distribution
+    const total = packetCount || 1;
+    const tcpPct = Math.round((protocolStats.tcp / total) * 100);
+    const udpPct = Math.round((protocolStats.udp / total) * 100);
+    const icmpPct = Math.round((protocolStats.icmp / total) * 100);
+    const otherPct = Math.round((protocolStats.other / total) * 100);
+    
+    document.getElementById('tcp-percentage').textContent = tcpPct + '%';
+    document.getElementById('udp-percentage').textContent = udpPct + '%';
+    document.getElementById('icmp-percentage').textContent = icmpPct + '%';
+    document.getElementById('other-percentage').textContent = otherPct + '%';
+    
+    document.getElementById('tcp-bar').style.width = tcpPct + '%';
+    document.getElementById('udp-bar').style.width = udpPct + '%';
+    document.getElementById('icmp-bar').style.width = icmpPct + '%';
+    document.getElementById('other-bar').style.width = otherPct + '%';
+}
+
+// Event listeners
+document.getElementById('start-capture').addEventListener('click', function() {
+    captureActive = true;
+    this.disabled = true;
+    document.getElementById('stop-capture').disabled = false;
+    
+    document.getElementById('packet-stream').innerHTML = '<div class="text-success">Capture started...</div>';
+    
+    // Start generating packets
+    captureInterval = setInterval(generatePacket, Math.random() * 2000 + 500);
+});
+
+document.getElementById('stop-capture').addEventListener('click', function() {
+    captureActive = false;
+    this.disabled = true;
+    document.getElementById('start-capture').disabled = false;
+    
+    clearInterval(captureInterval);
+    
+    const packetStream = document.getElementById('packet-stream');
+    const stopDiv = document.createElement('div');
+    stopDiv.className = 'text-danger mt-2';
+    stopDiv.textContent = 'Capture stopped.';
+    packetStream.appendChild(stopDiv);
+});
+
+document.getElementById('clear-capture').addEventListener('click', function() {
+    document.getElementById('packet-stream').innerHTML = '<div class="text-muted">Buffer cleared...</div>';
+    packetCount = 0;
+    dataVolume = 0;
+    protocolStats = { tcp: 0, udp: 0, icmp: 0, other: 0 };
+    updateStats();
+});
+
+document.getElementById('export-capture').addEventListener('click', function() {
+    alert('In a real implementation, this would export captured packets to a PCAP file for analysis in Wireshark or other tools.');
+});
+
+document.getElementById('apply-filters').addEventListener('click', function() {
+    const protocol = document.getElementById('protocol-filter').value;
+    const port = document.getElementById('port-filter').value;
+    const ip = document.getElementById('ip-filter').value;
+    
+    console.log('Applying filters:', { protocol, port, ip });
+    
+    // In a real implementation, this would filter the displayed packets
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-info alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="fas fa-filter"></i> Filters applied: Protocol=${protocol}, Port=${port}, IP=${ip}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+});
+
+// Initialize
+updateStats();
+</script>
+{% endblock %}

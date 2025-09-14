@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}File Upload Demo - Newman Cyber Lab{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-upload"></i> Insecure File Upload</h5>
+<p><strong>What is it?</strong> File upload vulnerabilities allow attackers to upload malicious files that can compromise the server or other users.</p>
+
+<h6>Common Vulnerabilities:</h6>
+<ul>
+    <li><strong>No file type validation:</strong> Accepting any file type</li>
+    <li><strong>Path traversal:</strong> ../ sequences in filenames</li>
+    <li><strong>Executable files:</strong> PHP, JSP, ASP scripts</li>
+    <li><strong>Large files:</strong> DoS through disk space exhaustion</li>
+</ul>
+
+<h6>Attack Vectors:</h6>
+<ul>
+    <li>Uploading web shells (PHP, ASP)</li>
+    <li>Path traversal attacks</li>
+    <li>MIME type spoofing</li>
+    <li>Double extension attacks (.jpg.php)</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>File type whitelisting</li>
+    <li>Secure filename handling</li>
+    <li>File size limits</li>
+    <li>Virus scanning</li>
+    <li>Separate upload directory</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-upload"></i> File Upload Security Demonstration</h2>
+        <p class="lead">Compare secure vs insecure file upload handling mechanisms.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Insecure Upload</h5>
+            </div>
+            <div class="card-body">
+                <p>This version accepts any file type and uses original filenames without validation.</p>
+                <div class="code-block">
+                    <code>filename = file.filename<br>file.save(os.path.join(upload_folder, filename))</code>
+                </div>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> No file type checking</li>
+                    <li><i class="fas fa-times text-danger"></i> Uses original filename</li>
+                    <li><i class="fas fa-times text-danger"></i> No path validation</li>
+                </ul>
+                <a href="{{ url_for('file_upload_insecure') }}" class="btn btn-danger">Try Insecure Upload</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Secure Upload</h5>
+            </div>
+            <div class="card-body">
+                <p>This version validates file types and uses secure filename handling.</p>
+                <div class="code-block">
+                    <code>if allowed_file(filename):<br>&nbsp;&nbsp;filename = secure_filename(filename)</code>
+                </div>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> File type whitelist</li>
+                    <li><i class="fas fa-check text-success"></i> Secure filename generation</li>
+                    <li><i class="fas fa-check text-success"></i> Path traversal protection</li>
+                </ul>
+                <a href="{{ url_for('file_upload_secure') }}" class="btn btn-success">Try Secure Upload</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-lightbulb"></i> File Upload Tests</h5>
+    <p>Try uploading different file types to see the difference:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <h6>Dangerous Files (blocked by secure):</h6>
+            <ul>
+                <li><code>.php</code> - Web shell scripts</li>
+                <li><code>.jsp</code> - Java server pages</li>
+                <li><code>.asp</code> - Active server pages</li>
+                <li><code>.exe</code> - Executable files</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h6>Safe Files (allowed by secure):</h6>
+            <ul>
+                <li><code>.txt</code> - Text files</li>
+                <li><code>.pdf</code> - PDF documents</li>
+                <li><code>.jpg, .png</code> - Images</li>
+                <li><code>.doc, .docx</code> - Documents</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand file upload security risks</li>
+        <li>Learn to implement file type validation</li>
+        <li>Practice secure filename handling</li>
+        <li>Recognize path traversal vulnerabilities</li>
+    </ul>
+</div>
+
+<div class="alert alert-primary">
+    <h5><i class="fas fa-user"></i> Login Required</h5>
+    <p class="mb-0">You need to be logged in to test file upload functionality. Use the test accounts or create a new one.</p>
+</div>
+{% endblock %}

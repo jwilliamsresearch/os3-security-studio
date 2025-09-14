@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Insecure Logging - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-exclamation-triangle text-danger"></i> Insecure Logging</h5>
+<p><strong>Security Risk:</strong> Poor logging practices that fail to detect attacks or expose sensitive information.</p>
+
+<h6>Common Issues:</h6>
+<ul>
+    <li><strong>Missing Security Events:</strong> Not logging authentication failures</li>
+    <li><strong>Excessive Logging:</strong> Logging sensitive data like passwords</li>
+    <li><strong>Poor Log Management:</strong> No centralization or monitoring</li>
+    <li><strong>Insufficient Context:</strong> Missing user context and timestamps</li>
+</ul>
+
+<h6>Attack Scenarios:</h6>
+<ul>
+    <li>Undetected brute force attacks</li>
+    <li>Privilege escalation goes unnoticed</li>
+    <li>Data exfiltration without alerts</li>
+    <li>Forensic investigation impossible</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> Warning: Insecure Logging Practices</h4>
+            <p>This demonstration shows <strong>poor logging practices</strong> that can compromise security and compliance.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-sign-in-alt"></i> Insecure Login Attempt</h5>
+            </div>
+            <div class="card-body">
+                <p>This login form has poor logging - try various usernames and passwords:</p>
+                <form id="insecureLoginForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="insecureUsername" placeholder="Username" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="insecurePassword" placeholder="Password" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Login (Poor Logging)</button>
+                </form>
+                <div id="insecureLoginResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Bad Practice:</strong> Minimal logging, sensitive data exposure, no monitoring
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-warning mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-file-alt"></i> Poor Log Entries</h5>
+            </div>
+            <div class="card-body">
+                <p>See what gets logged with poor practices:</p>
+                <div id="poorLogs" class="border rounded p-2 bg-light" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.8em;">
+                    <div class="text-muted">Logs will appear here...</div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-warning btn-sm" onclick="clearPoorLogs()">Clear Logs</button>
+                    <button class="btn btn-outline-info btn-sm" onclick="generateSampleLogs()">Generate Sample Logs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-bug"></i> Security Issues Demonstrated</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-eye-slash"></i> Missing Events</h6>
+                        <ul class="small">
+                            <li>No failed login attempts</li>
+                            <li>No privilege changes</li>
+                            <li>No access control failures</li>
+                            <li>No suspicious activities</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-unlock"></i> Sensitive Data</h6>
+                        <ul class="small">
+                            <li>Passwords in logs</li>
+                            <li>Personal information</li>
+                            <li>Session tokens</li>
+                            <li>API keys exposed</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-clock"></i> Poor Context</h6>
+                        <ul class="small">
+                            <li>Missing timestamps</li>
+                            <li>No user identification</li>
+                            <li>Unclear event details</li>
+                            <li>No correlation IDs</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-search"></i> No Monitoring</h6>
+                        <ul class="small">
+                            <li>No real-time alerts</li>
+                            <li>No anomaly detection</li>
+                            <li>No trend analysis</li>
+                            <li>No SIEM integration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('logging_monitoring.secure_logging') }}" class="btn btn-success btn-lg">
+            <i class="fas fa-shield-alt"></i> See Secure Logging Implementation
+        </a>
+        <a href="{{ url_for('logging_monitoring.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+document.getElementById('insecureLoginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('insecureUsername').value;
+    const password = document.getElementById('insecurePassword').value;
+    
+    fetch('/logging_monitoring/insecure_login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({username: username, password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('insecureLoginResult');
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>Login Response:</h6>
+                    <p>${data.message}</p>
+                    <small class="text-muted">Check the logs to see what was recorded (poorly)</small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6>Login Failed:</h6>
+                    <p>${data.message}</p>
+                    <small class="text-muted">Notice: Failed attempts may not be properly logged!</small>
+                </div>
+            `;
+        }
+        
+        // Add to poor logs
+        addToPoorLogs(data.log_entry);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('insecureLoginResult').innerHTML = 
+            '<div class="alert alert-danger">Error during login attempt</div>';
+    });
+});
+
+function addToPoorLogs(logEntry) {
+    const logsDiv = document.getElementById('poorLogs');
+    const logLine = document.createElement('div');
+    logLine.innerHTML = logEntry;
+    logLine.className = 'border-bottom pb-1 mb-1';
+    logsDiv.appendChild(logLine);
+    logsDiv.scrollTop = logsDiv.scrollHeight;
+}
+
+function clearPoorLogs() {
+    document.getElementById('poorLogs').innerHTML = '<div class="text-muted">Logs cleared...</div>';
+}
+
+function generateSampleLogs() {
+    const sampleLogs = [
+        '<span class="text-danger">ERROR: Login failed for user: admin, password: admin123</span>',
+        '<span class="text-info">INFO: User data: {username: john, ssn: 123-45-6789}</span>',
+        '<span class="text-warning">WARN: Something happened</span>',
+        '<span class="text-success">SUCCESS: Payment processed: card=4532****1234, amount=$500</span>',
+        '<span class="text-muted">DEBUG: Session token: abc123def456ghi789</span>'
+    ];
+    
+    const logsDiv = document.getElementById('poorLogs');
+    logsDiv.innerHTML = '<div class="text-muted">Sample poor logging practices:</div>';
+    
+    sampleLogs.forEach((log, index) => {
+        setTimeout(() => {
+            const logLine = document.createElement('div');
+            logLine.innerHTML = log;
+            logLine.className = 'border-bottom pb-1 mb-1';
+            logsDiv.appendChild(logLine);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }, index * 500);
+    });
+}
+</script>
+{% endblock %}

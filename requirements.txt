@@ -1,0 +1,7 @@
+Flask==2.3.3
+Werkzeug==2.3.7
+bleach==6.0.0
+requests==2.31.0
+bcrypt==4.3.0
+cryptography==45.0.5
+PyYAML==6.0.2

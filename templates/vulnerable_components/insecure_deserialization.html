@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}Insecure Deserialization - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-bomb text-danger"></i> Insecure Deserialization</h5>
+<p><strong>Security Risk:</strong> Unsafe deserialization can lead to remote code execution, authentication bypass, and data tampering.</p>
+
+<h6>Dangerous Functions:</h6>
+<ul>
+    <li><strong>yaml.load():</strong> Can execute arbitrary Python code</li>
+    <li><strong>pickle.loads():</strong> Can run malicious payloads</li>
+    <li><strong>eval():</strong> Direct code execution</li>
+    <li><strong>exec():</strong> Execute arbitrary commands</li>
+</ul>
+
+<h6>Safe Alternatives:</h6>
+<ul>
+    <li><strong>yaml.safe_load():</strong> Safe YAML parsing</li>
+    <li><strong>json.loads():</strong> JSON is safer than pickle</li>
+    <li><strong>ast.literal_eval():</strong> Safe evaluation</li>
+    <li><strong>Input validation:</strong> Validate all untrusted data</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-bomb"></i> Danger: Insecure Deserialization</h4>
+            <p>This demonstration shows how <strong>unsafe deserialization</strong> can lead to remote code execution. Never deserialize untrusted data!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Unsafe YAML Loading</h5>
+            </div>
+            <div class="card-body">
+                <p>Using <code>yaml.load()</code> without safe loader can execute arbitrary code:</p>
+                <form id="unsafeYamlForm">
+                    <div class="mb-3">
+                        <label for="yamlContent" class="form-label">YAML Content:</label>
+                        <textarea class="form-control" id="yamlContent" rows="6" placeholder="Enter YAML content...">
+user_data:
+  name: "John Doe"
+  email: "john@example.com"
+  role: "user"
+settings:
+  theme: "dark"
+  notifications: true</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Load with yaml.load() [UNSAFE]</button>
+                    <button type="button" class="btn btn-outline-info ml-2" onclick="loadVulnerableYaml()">Load Malicious Example</button>
+                </form>
+                <div id="unsafeYamlResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Safe YAML Loading</h5>
+            </div>
+            <div class="card-body">
+                <p>Using <code>yaml.safe_load()</code> prevents code execution:</p>
+                <form id="safeYamlForm">
+                    <div class="mb-3">
+                        <label for="safeYamlContent" class="form-label">YAML Content:</label>
+                        <textarea class="form-control" id="safeYamlContent" rows="6" placeholder="Enter YAML content...">
+user_data:
+  name: "Jane Smith"
+  email: "jane@example.com"
+  role: "admin"
+settings:
+  theme: "light"
+  notifications: false</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Load with yaml.safe_load() [SAFE]</button>
+                </form>
+                <div id="safeYamlResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-warning mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-file-archive"></i> Pickle Deserialization</h5>
+            </div>
+            <div class="card-body">
+                <p>Pickle can execute arbitrary code when deserializing:</p>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-outline-primary" onclick="generatePickleData()">Generate Safe Pickle Data</button>
+                </div>
+                <form id="pickleForm">
+                    <div class="mb-3">
+                        <label for="pickleData" class="form-label">Base64 Pickle Data:</label>
+                        <textarea class="form-control" id="pickleData" rows="4" placeholder="Paste base64 encoded pickle data..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning">Unpickle Data [DANGEROUS]</button>
+                </form>
+                <div id="pickleResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-code"></i> Attack Payloads</h5>
+            </div>
+            <div class="card-body">
+                <p>Examples of malicious payloads (for educational purposes):</p>
+                
+                <h6>Malicious YAML:</h6>
+                <div class="code-block">
+                    <code class="small">
+# This would execute code with yaml.load()<br>
+dangerous: !!python/object/apply:os.system<br>
+  - "echo 'System compromised!'"<br><br>
+# Or this for subprocess execution<br>
+exploit: !!python/object/apply:subprocess.check_output<br>
+  - [["whoami"]]
+                    </code>
+                </div>
+                
+                <h6>Malicious Pickle:</h6>
+                <div class="code-block">
+                    <code class="small">
+# Python code to create malicious pickle<br>
+import pickle, os<br>
+class Exploit(object):<br>
+&nbsp;&nbsp;def __reduce__(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return (os.system, ('echo pwned',))<br>
+pickle.dumps(Exploit())
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> Security Best Practices</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-shield-alt"></i> Safe Deserialization</h6>
+                        <ul>
+                            <li>Use <code>yaml.safe_load()</code> instead of <code>yaml.load()</code></li>
+                            <li>Prefer JSON over pickle for data exchange</li>
+                            <li>Use <code>ast.literal_eval()</code> for safe evaluation</li>
+                            <li>Validate all input data before processing</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-ban"></i> What to Avoid</h6>
+                        <ul>
+                            <li>Never use <code>pickle</code> with untrusted data</li>
+                            <li>Avoid <code>eval()</code> and <code>exec()</code> with user input</li>
+                            <li>Don't use <code>yaml.load()</code> without safe loader</li>
+                            <li>Never deserialize signed but unencrypted data</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-tools"></i> Additional Protection</h6>
+                        <ul>
+                            <li>Run deserialization in sandboxed environments</li>
+                            <li>Implement integrity checks (HMAC)</li>
+                            <li>Use type checking and validation</li>
+                            <li>Monitor for unusual system calls</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('vulnerable_components.outdated_libs') }}" class="btn btn-warning btn-lg">
+            <i class="fas fa-exclamation-triangle"></i> Check Outdated Libraries
+        </a>
+        <a href="{{ url_for('vulnerable_components.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+function loadVulnerableYaml() {
+    fetch('/vulnerable_components/generate_vulnerable_yaml')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('yamlContent').value = data.yaml_content;
+        
+        // Show warning
+        const resultDiv = document.getElementById('unsafeYamlResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-exclamation-triangle"></i> Malicious YAML Loaded</h6>
+                <p>${data.warning}</p>
+                <p><small>${data.info}</small></p>
+            </div>
+        `;
+    });
+}
+
+function generatePickleData() {
+    fetch('/vulnerable_components/generate_pickle_payload')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('pickleData').value = data.pickle_data;
+        
+        // Show info
+        const resultDiv = document.getElementById('pickleResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> Safe Pickle Data Generated</h6>
+                <p>${data.info}</p>
+                <p class="text-warning"><small><i class="fas fa-exclamation-triangle"></i> ${data.warning}</small></p>
+            </div>
+        `;
+    });
+}
+
+// Unsafe YAML form
+document.getElementById('unsafeYamlForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const yamlContent = document.getElementById('yamlContent').value;
+    
+    fetch('/vulnerable_components/unsafe_yaml_load', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({yaml_content: yamlContent})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('unsafeYamlResult');
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Unsafe YAML Loaded!</h6>
+                    <p><strong>Parsed Data:</strong></p>
+                    <pre class="bg-light p-2 rounded">${data.parsed_data}</pre>
+                    <p><strong>Method:</strong> ${data.method}</p>
+                    <p class="text-danger"><strong>Warning:</strong> ${data.warning}</p>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-times-circle"></i> YAML Loading Failed</h6>
+                    <p><strong>Error:</strong> ${data.error}</p>
+                    <p class="text-warning"><strong>Warning:</strong> ${data.warning}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('unsafeYamlResult').innerHTML = 
+            '<div class="alert alert-danger">Error processing YAML</div>';
+    });
+});
+
+// Safe YAML form
+document.getElementById('safeYamlForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const yamlContent = document.getElementById('safeYamlContent').value;
+    
+    fetch('/vulnerable_components/safe_yaml_load', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({yaml_content: yamlContent})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('safeYamlResult');
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-check-circle"></i> Safe YAML Loaded Successfully</h6>
+                    <p><strong>Parsed Data:</strong></p>
+                    <pre class="bg-light p-2 rounded">${JSON.stringify(data.parsed_data, null, 2)}</pre>
+                    <p><strong>Method:</strong> ${data.method}</p>
+                    <p class="text-success"><strong>Info:</strong> ${data.info}</p>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-circle"></i> YAML Parsing Failed</h6>
+                    <p><strong>Error:</strong> ${data.error}</p>
+                    <p class="text-success"><strong>Info:</strong> ${data.info}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('safeYamlResult').innerHTML = 
+            '<div class="alert alert-danger">Error processing YAML</div>';
+    });
+});
+
+// Pickle form
+document.getElementById('pickleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const pickleData = document.getElementById('pickleData').value;
+    
+    fetch('/vulnerable_components/unsafe_pickle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({pickle_data: pickleData})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('pickleResult');
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Pickle Operation Attempted</h6>
+                    <p><strong>Method:</strong> ${data.method}</p>
+                    <p><strong>Data Length:</strong> ${data.data_length} bytes</p>
+                    <p><strong>Simulated:</strong> ${data.simulated ? 'Yes (for safety)' : 'No'}</p>
+                    <p class="text-danger"><strong>Warning:</strong> ${data.warning}</p>
+                    <p class="text-info"><strong>Info:</strong> ${data.info}</p>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-times-circle"></i> Pickle Operation Failed</h6>
+                    <p><strong>Error:</strong> ${data.error}</p>
+                    <p class="text-danger"><strong>Warning:</strong> ${data.warning}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('pickleResult').innerHTML = 
+            '<div class="alert alert-danger">Error processing pickle data</div>';
+    });
+});
+
+// Copy YAML content between forms
+document.getElementById('yamlContent').addEventListener('input', function() {
+    document.getElementById('safeYamlContent').value = this.value;
+});
+
+document.getElementById('safeYamlContent').addEventListener('input', function() {
+    document.getElementById('yamlContent').value = this.value;
+});
+</script>
+{% endblock %}

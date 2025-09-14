@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}CSRF - Insecure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE VERSION - CSRF Vulnerable</h4>
+            <p class="mb-0">This banking interface has no CSRF protection. Forms can be submitted from external sites!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-university"></i> Newman Bank - Money Transfer</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6>Account Balance: ${{ "%.2f"|format(balance) }}</h6>
+                </div>
+
+                <form method="POST" action="{{ url_for('csrf.insecure_transfer') }}">>
+                    <div class="mb-3">
+                        <label for="recipient" class="form-label">Recipient Username:</label>
+                        <input type="text" class="form-control" name="recipient" placeholder="Enter recipient username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount ($):</label>
+                        <input type="number" class="form-control" name="amount" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send Money
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerable Code:</h6>
+                <div class="code-block">
+                    <code>
+@app.route('/transfer', methods=['POST'])<br>
+def transfer():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;# No CSRF validation!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;amount = request.form.get('amount')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;recipient = request.form.get('recipient')
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Missing Protection:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> No CSRF token</li>
+                    <li><i class="fas fa-times text-danger"></i> No origin validation</li>
+                    <li><i class="fas fa-times text-danger"></i> No referrer checking</li>
+                    <li><i class="fas fa-times text-danger"></i> No request confirmation</li>
+                </ul>
+
+                <h6 class="mt-3">CSRF Attack Example:</h6>
+                <p class="small">A malicious website could include this hidden form:</p>
+                <div class="code-block">
+                    <small>
+                        <code>
+&lt;form action="/csrf/insecure/transfer" method="POST"&gt;<br>
+&nbsp;&nbsp;&lt;input type="hidden" name="amount" value="1000"&gt;<br>
+&nbsp;&nbsp;&lt;input type="hidden" name="recipient" value="attacker"&gt;<br>
+&lt;/form&gt;<br>
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;
+                        </code>
+                    </small>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('csrf.secure') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-shield-alt"></i> See Secure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

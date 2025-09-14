@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Security Configuration Demo - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-cog"></i> Security Misconfiguration</h5>
+<p><strong>What is it?</strong> Security misconfigurations occur when security settings are not properly implemented, creating vulnerabilities.</p>
+
+<h6>Common Misconfigurations:</h6>
+<ul>
+    <li><strong>Default credentials:</strong> admin/admin, root/root</li>
+    <li><strong>Missing security headers:</strong> No HTTPS, CSP, HSTS</li>
+    <li><strong>Unnecessary features:</strong> Debug mode, directory listing</li>
+    <li><strong>Outdated software:</strong> Unpatched frameworks</li>
+</ul>
+
+<h6>Security Headers:</h6>
+<ul>
+    <li><strong>HSTS:</strong> Enforce HTTPS connections</li>
+    <li><strong>CSP:</strong> Content Security Policy</li>
+    <li><strong>X-Frame-Options:</strong> Prevent clickjacking</li>
+    <li><strong>X-Content-Type-Options:</strong> MIME sniffing protection</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>Security hardening checklists</li>
+    <li>Regular security audits</li>
+    <li>Automated configuration management</li>
+    <li>Security header implementation</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-cog"></i> Security Configuration Demonstration</h2>
+        <p class="lead">Compare proper vs improper security configuration and headers.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-exclamation-triangle"></i> Common Misconfigurations</h5>
+            </div>
+            <div class="card-body">
+                <h6>Default Credentials Found:</h6>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><strong>Admin Account:</strong></span>
+                        <code>admin / admin123</code>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><strong>Database:</strong></span>
+                        <code>root / password</code>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><strong>Debug Mode:</strong></span>
+                        <span class="badge bg-danger">ENABLED</span>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3">Missing Security Features:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> No security headers</li>
+                    <li><i class="fas fa-times text-danger"></i> HTTP instead of HTTPS</li>
+                    <li><i class="fas fa-times text-danger"></i> Debug information exposed</li>
+                    <li><i class="fas fa-times text-danger"></i> No rate limiting</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Secure Configuration</h5>
+            </div>
+            <div class="card-body">
+                <h6>Security Headers Implemented:</h6>
+                <a href="{{ url_for('security_config.headers') }}" class="btn btn-success mb-3">Check Security Headers</a>
+                
+                <h6>Security Features:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Strong password policies</li>
+                    <li><i class="fas fa-check text-success"></i> CSRF protection</li>
+                    <li><i class="fas fa-check text-success"></i> Input sanitization</li>
+                    <li><i class="fas fa-check text-success"></i> Secure session management</li>
+                </ul>
+
+                <h6 class="mt-3">Recommended Headers:</h6>
+                <div class="code-block">
+                    <small>
+                        <code>
+X-Content-Type-Options: nosniff<br>
+X-Frame-Options: DENY<br>
+X-XSS-Protection: 1; mode=block<br>
+Strict-Transport-Security: max-age=31536000<br>
+Content-Security-Policy: default-src 'self'
+                        </code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-lightbulb"></i> Configuration Issues</h5>
+    <p>Common security misconfigurations found in web applications:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <h6>Application Level:</h6>
+            <ul>
+                <li>Debug mode enabled in production</li>
+                <li>Default credentials not changed</li>
+                <li>Unnecessary services running</li>
+                <li>Verbose error messages</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h6>Server Level:</h6>
+            <ul>
+                <li>Missing security headers</li>
+                <li>Outdated software versions</li>
+                <li>Open ports and services</li>
+                <li>Weak SSL/TLS configuration</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Identify common security misconfigurations</li>
+        <li>Learn to implement security headers</li>
+        <li>Understand the importance of secure defaults</li>
+        <li>Practice security hardening techniques</li>
+    </ul>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-tools"></i> Security Hardening Checklist</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>✅ Application Security:</h6>
+                <ul class="small">
+                    <li>Change default credentials</li>
+                    <li>Disable debug mode in production</li>
+                    <li>Implement proper error handling</li>
+                    <li>Use secure session configuration</li>
+                    <li>Enable security headers</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>✅ Server Security:</h6>
+                <ul class="small">
+                    <li>Keep software updated</li>
+                    <li>Close unnecessary ports</li>
+                    <li>Configure proper SSL/TLS</li>
+                    <li>Implement rate limiting</li>
+                    <li>Regular security audits</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

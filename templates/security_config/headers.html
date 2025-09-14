@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Security Headers Check - OS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h4><i class="fas fa-globe"></i> Security Headers Analysis</h4>
+            <p class="mb-0">This page demonstrates security headers implementation. Check your browser's developer tools to see the headers.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-shield-alt"></i> Security Headers Status</h5>
+            </div>
+            <div class="card-body">
+                <p>The following security headers are implemented for secure endpoints:</p>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Header</th>
+                                <th>Value</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>X-Content-Type-Options</code></td>
+                                <td><code>nosniff</code></td>
+                                <td>Prevents MIME sniffing attacks</td>
+                                <td><span class="badge bg-success">✓ Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>X-Frame-Options</code></td>
+                                <td><code>DENY</code></td>
+                                <td>Prevents clickjacking attacks</td>
+                                <td><span class="badge bg-success">✓ Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>X-XSS-Protection</code></td>
+                                <td><code>1; mode=block</code></td>
+                                <td>Enables XSS filtering in browsers</td>
+                                <td><span class="badge bg-success">✓ Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Strict-Transport-Security</code></td>
+                                <td><code>max-age=31536000; includeSubDomains</code></td>
+                                <td>Enforces HTTPS connections</td>
+                                <td><span class="badge bg-success">✓ Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Content-Security-Policy</code></td>
+                                <td><code>default-src 'self'</code></td>
+                                <td>Controls resource loading</td>
+                                <td><span class="badge bg-success">✓ Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-success mt-3">
+                    <h6><i class="fas fa-info-circle"></i> How to Check Headers</h6>
+                    <ol class="mb-0">
+                        <li>Open browser developer tools (F12)</li>
+                        <li>Go to Network tab</li>
+                        <li>Refresh this page</li>
+                        <li>Click on the request to this page</li>
+                        <li>Check the Response Headers section</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-code"></i> Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Security Headers Code:</h6>
+                <div class="code-block">
+                    <small>
+                        <code>
+@app.after_request<br>
+def after_request(response):<br>
+&nbsp;&nbsp;if 'secure' in request.endpoint:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response.headers['X-Content-Type-Options'] = 'nosniff'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response.headers['X-Frame-Options'] = 'DENY'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response.headers['X-XSS-Protection'] = '1; mode=block'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response.headers['Strict-Transport-Security'] = 'max-age=31536000'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response.headers['Content-Security-Policy'] = "default-src 'self'"<br>
+&nbsp;&nbsp;return response
+                        </code>
+                    </small>
+                </div>
+
+                <h6 class="mt-3">Header Benefits:</h6>
+                <ul class="small">
+                    <li><strong>HSTS:</strong> Prevents protocol downgrade attacks</li>
+                    <li><strong>CSP:</strong> Mitigates XSS and injection attacks</li>
+                    <li><strong>X-Frame-Options:</strong> Stops clickjacking</li>
+                    <li><strong>X-Content-Type:</strong> Blocks MIME confusion</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-exclamation-triangle"></i> Missing Headers</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">For insecure endpoints, these headers are missing:</p>
+                <ul class="small">
+                    <li>No HSTS enforcement</li>
+                    <li>No CSP protection</li>
+                    <li>No frame protection</li>
+                    <li>No MIME type enforcement</li>
+                </ul>
+                <p class="small text-muted">Compare by checking headers on insecure demo pages.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5><i class="fas fa-tools"></i> Security Header Testing Tools</h5>
+    </div>
+    <div class="card-body">
+        <p>Use these online tools to test security headers:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Online Testing Tools:</h6>
+                <ul>
+                    <li><a href="https://securityheaders.com" target="_blank">SecurityHeaders.com</a></li>
+                    <li><a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs Test</a></li>
+                    <li><a href="https://observatory.mozilla.org" target="_blank">Mozilla Observatory</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Browser Tools:</h6>
+                <ul>
+                    <li>Developer Tools → Network Tab</li>
+                    <li>Security Tab in DevTools</li>
+                    <li>Browser extensions for security analysis</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,853 @@
+{% extends "base.html" %}
+
+{% block title %}Stealth Scanning Demo - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-user-ninja text-dark"></i> Interactive Stealth Scanning</h2>
+                    <p class="text-muted">Advanced scanning methods for evading detection - Try it yourself!</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('port_scanner.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Port Scanning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Scan Controls -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs"></i> Scan Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="stealthScanForm">
+                        <div class="mb-3">
+                            <label for="targetInput" class="form-label">Target IP:</label>
+                            <input type="text" class="form-control" id="targetInput" value="{{ scan_info.target }}" placeholder="192.168.1.100">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="techniqueSelect" class="form-label">Stealth Technique:</label>
+                            <select class="form-select" id="techniqueSelect">
+                                <option value="SYN Stealth Scan" selected>SYN Stealth Scan</option>
+                                <option value="FIN Scan">FIN Scan</option>
+                                <option value="Idle/Zombie Scan">Idle/Zombie Scan</option>
+                                <option value="Fragmented Packets">Fragmented Packets</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="timingSelect" class="form-label">Timing Template:</label>
+                            <select class="form-select" id="timingSelect">
+                                <option value="T1">T1 (Sneaky)</option>
+                                <option value="T2">T2 (Polite)</option>
+                                <option value="T3" selected>T3 (Normal)</option>
+                                <option value="T4">T4 (Aggressive)</option>
+                                <option value="T5">T5 (Insane)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="portsInput" class="form-label">Port Range:</label>
+                            <input type="text" class="form-control" id="portsInput" value="1-1000" placeholder="22,80,443 or 1-1000">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-dark btn-lg w-100" id="runScanBtn">
+                            <i class="fas fa-play"></i> Execute Stealth Scan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Real-time Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="scanStatus">
+                        <div class="alert alert-secondary">
+                            <i class="fas fa-clock"></i> Waiting for scan to start...
+                        </div>
+                    </div>
+                    
+                    <div id="scanProgress" style="display: none;">
+                        <div class="mb-2">Scan Progress:</div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 id="progressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="scanResults" style="display: none;">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-dark">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-mask"></i> Current Scan Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Educational Purpose:</strong> This demonstrates advanced scanning techniques for defensive awareness.
+                    </div>
+
+                    <h6>Default Configuration:</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>Target:</strong> {{ scan_info.target }}</li>
+                                <li><strong>Technique:</strong> {{ scan_info.technique }}</li>
+                                <li><strong>Timing:</strong> {{ scan_info.timing }}</li>
+                                <li><strong>Fragmentation:</strong> {{ scan_info.fragmentation }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>Source Port:</strong> {{ scan_info.source_port }}</li>
+                                <li><strong>Decoy IPs:</strong> {{ scan_info.decoys|length }} addresses</li>
+                                <li><strong>Status:</strong> <span class="badge bg-info">Ready</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Decoy IP Addresses:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for decoy in scan_info.decoys %}
+                            <span class="badge bg-secondary">{{ decoy }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <h6>Command Preview:</h6>
+                    <div class="bg-light p-3 rounded">
+                        <code id="commandPreview">nmap -sS -T3 -f --source-port 53 192.168.1.100</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Detection Risk
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-success" style="width: 75%">
+                            Low Risk (75%)
+                        </div>
+                    </div>
+                    <small class="text-muted">Current configuration has low detection probability</small>
+                </div>
+            </div>
+
+            <div class="card border-info mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clock"></i> Estimated Time
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <h4 class="text-info mb-0">{{ scan_info.estimated_time }}</h4>
+                    <small class="text-muted">With current timing template</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stealth Techniques Comparison -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-eye-slash"></i> Stealth Techniques Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Technique</th>
+                                    <th>Stealth Level</th>
+                                    <th>Speed</th>
+                                    <th>Reliability</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for technique in techniques %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ technique.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-{{ technique.stealth_color }}" style="width: {{ technique.stealth_level }}%">
+                                                {{ technique.stealth_level }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ technique.speed_color }}">{{ technique.speed }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ technique.reliability_color }}">{{ technique.reliability }}</span>
+                                    </td>
+                                    <td>{{ technique.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evasion Methods -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-ghost"></i> Active Evasion Methods
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for method in evasion_methods %}
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>{{ method.name }}:</strong> {{ method.description }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Scan Progress
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar bg-dark progress-bar-striped progress-bar-animated" 
+                             style="width: {{ scan_progress }}%">
+                            {{ scan_progress }}% Complete
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <h6 class="text-success mb-0">{{ ports_scanned }}</h6>
+                                <small class="text-muted">Ports Scanned</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <h6 class="text-info mb-0">{{ open_ports }}</h6>
+                                <small class="text-muted">Open Ports</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <h6 class="text-warning mb-0">{{ filtered_ports }}</h6>
+                                <small class="text-muted">Filtered</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Open Ports Found:</h6>
+                        {% if found_ports %}
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for port in found_ports %}
+                            <span class="badge bg-success">{{ port.port }}/{{ port.protocol }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No open ports detected yet...</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Educational Content -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-graduation-cap"></i> Learning Objectives
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Understanding Stealth Scanning:</h6>
+                            <ul>
+                                <li>TCP SYN stealth scan mechanics</li>
+                                <li>Packet fragmentation techniques</li>
+                                <li>Timing attack prevention</li>
+                                <li>Source port manipulation</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Defense Implications:</h6>
+                            <ul>
+                                <li>IDS signature development</li>
+                                <li>Rate limiting implementation</li>
+                                <li>Anomaly detection tuning</li>
+                                <li>Network baseline establishment</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentProgress = parseInt('{{ scan_progress }}');
+    let isScanning = false;
+    
+    // Update command preview when form changes
+    function updateCommandPreview() {
+        const target = document.getElementById('targetInput').value;
+        const technique = document.getElementById('techniqueSelect').value;
+        const timing = document.getElementById('timingSelect').value;
+        const ports = document.getElementById('portsInput').value;
+        
+        let command = 'nmap ';
+        
+        // Add technique flag
+        switch(technique) {
+            case 'SYN Stealth Scan':
+                command += '-sS ';
+                break;
+            case 'FIN Scan':
+                command += '-sF ';
+                break;
+            case 'Idle/Zombie Scan':
+                command += '-sI ';
+                break;
+            case 'Fragmented Packets':
+                command += '-f ';
+                break;
+        }
+        
+        command += `-${timing.toLowerCase()} `;
+        command += `--source-port 53 `;
+        command += `-p ${ports} `;
+        command += target;
+        
+        document.getElementById('commandPreview').textContent = command;
+    }
+    
+    // Form event listeners
+    document.getElementById('targetInput').addEventListener('input', updateCommandPreview);
+    document.getElementById('techniqueSelect').addEventListener('change', updateCommandPreview);
+    document.getElementById('timingSelect').addEventListener('change', updateCommandPreview);
+    document.getElementById('portsInput').addEventListener('input', updateCommandPreview);
+    
+    // Scan form submission
+    document.getElementById('stealthScanForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (isScanning) return;
+        
+        isScanning = true;
+        const runBtn = document.getElementById('runScanBtn');
+        const originalText = runBtn.innerHTML;
+        
+        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+        runBtn.disabled = true;
+        
+        // Show progress
+        document.getElementById('scanProgress').style.display = 'block';
+        document.getElementById('scanStatus').innerHTML = '<div class="alert alert-info"><i class="fas fa-cogs fa-spin"></i> Initializing stealth scan...</div>';
+        
+        const formData = {
+            target: document.getElementById('targetInput').value,
+            technique: document.getElementById('techniqueSelect').value,
+            timing: document.getElementById('timingSelect').value,
+            ports: document.getElementById('portsInput').value
+        };
+        
+        fetch('/port_scanner/run_stealth_scan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                simulateScanProgress(data.results);
+            } else {
+                showError(data.error || 'Scan failed');
+            }
+        })
+        .catch(error => {
+            showError('Network error: ' + error.message);
+        })
+        .finally(() => {
+            setTimeout(() => {
+                runBtn.innerHTML = originalText;
+                runBtn.disabled = false;
+                isScanning = false;
+            }, 3000);
+        });
+    });
+    
+    function simulateScanProgress(results) {
+        let progress = 0;
+        const progressBar = document.getElementById('progressBar');
+        const statusDiv = document.getElementById('scanStatus');
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 15 + 5;
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+            
+            if (progress < 30) {
+                statusDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-search"></i> Probing target...</div>';
+            } else if (progress < 70) {
+                statusDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-network-wired"></i> Scanning ports...</div>';
+            } else if (progress < 100) {
+                statusDiv.innerHTML = '<div class="alert alert-primary"><i class="fas fa-chart-line"></i> Analyzing results...</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> Scan completed successfully!</div>';
+                showResults(results);
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+    
+    function showResults(results) {
+        const resultsDiv = document.getElementById('scanResults');
+        let html = '<div class="mt-3"><h6>Scan Results:</h6>';
+        html += '<div class="table-responsive"><table class="table table-sm">';
+        html += '<thead><tr><th>Port</th><th>State</th><th>Service</th><th>Method</th></tr></thead><tbody>';
+        
+        results.open_ports.forEach(port => {
+            html += `<tr class="table-success">
+                <td>${port.port}</td>
+                <td><span class="badge bg-success">Open</span></td>
+                <td>${port.service}</td>
+                <td>${port.method}</td>
+            </tr>`;
+        });
+        
+        if (results.filtered_ports && results.filtered_ports.length > 0) {
+            results.filtered_ports.slice(0, 5).forEach(port => {
+                html += `<tr class="table-warning">
+                    <td>${port}</td>
+                    <td><span class="badge bg-warning">Filtered</span></td>
+                    <td>Unknown</td>
+                    <td>Stealth</td>
+                </tr>`;
+            });
+        }
+        
+        html += '</tbody></table></div>';
+        html += `<div class="alert alert-info mt-2">
+            <strong>Detection Risk:</strong> ${results.detection_risk}<br>
+            <strong>Scan Duration:</strong> ${results.scan_time}<br>
+            <strong>Packets Sent:</strong> ${results.packets_sent}
+        </div></div>`;
+        
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = 'block';
+    }
+    
+    function showError(message) {
+        document.getElementById('scanStatus').innerHTML = 
+            `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+        document.getElementById('scanProgress').style.display = 'none';
+    }
+    
+    // Initialize command preview
+    updateCommandPreview();
+});
+</script>
+{% endblock %}
+                                <li><strong>Scan Rate:</strong> {{ scan_info.rate }} packets/sec</li>
+                                <li><strong>Detection Risk:</strong> <span class="badge bg-{{ scan_info.risk_color }}">{{ scan_info.risk_level }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h6>Scan Techniques Comparison:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Technique</th>
+                                    <th>Stealth Level</th>
+                                    <th>Speed</th>
+                                    <th>Accuracy</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for technique in techniques %}
+                                <tr class="{{ 'table-primary' if technique.name == scan_info.technique else '' }}">
+                                    <td><strong>{{ technique.name }}</strong></td>
+                                    <td>
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar bg-{{ technique.stealth_color }}" style="width: {{ technique.stealth_level }}%">
+                                                {{ technique.stealth_level }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-{{ technique.speed_color }}">{{ technique.speed }}</span></td>
+                                    <td><span class="badge bg-{{ technique.accuracy_color }}">{{ technique.accuracy }}</span></td>
+                                    <td class="small">{{ technique.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="mt-3">Evasion Techniques:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="h6">Timing Evasion:</h6>
+                            <ul class="small">
+                                <li><i class="fas fa-clock"></i> Variable delays between packets</li>
+                                <li><i class="fas fa-clock"></i> Randomized scan order</li>
+                                <li><i class="fas fa-clock"></i> Time-based distribution</li>
+                            </ul>
+                            
+                            <h6 class="h6 mt-3">Source Obfuscation:</h6>
+                            <ul class="small">
+                                <li><i class="fas fa-user-secret"></i> Decoy IP addresses</li>
+                                <li><i class="fas fa-user-secret"></i> Source port manipulation</li>
+                                <li><i class="fas fa-user-secret"></i> MAC address spoofing</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="h6">Fragmentation:</h6>
+                            <ul class="small">
+                                <li><i class="fas fa-puzzle-piece"></i> Packet fragmentation</li>
+                                <li><i class="fas fa-puzzle-piece"></i> MTU discovery evasion</li>
+                                <li><i class="fas fa-puzzle-piece"></i> Overlapping fragments</li>
+                            </ul>
+                            
+                            <h6 class="h6 mt-3">Protocol Manipulation:</h6>
+                            <ul class="small">
+                                <li><i class="fas fa-network-wired"></i> TCP flag manipulation</li>
+                                <li><i class="fas fa-network-wired"></i> Custom packet crafting</li>
+                                <li><i class="fas fa-network-wired"></i> Protocol tunneling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Current Scan Progress:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-dark" style="width: {{ scan_progress }}%">
+                                {{ scan_progress }}% Complete
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Scanning {{ scanned_ports }}/{{ total_ports }} ports | 
+                            {{ open_ports }} open | {{ filtered_ports }} filtered | {{ closed_ports }} closed
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-shield-alt"></i> Detection Methods</h6>
+                </div>
+                <div class="card-body">
+                    <h6>IDS/IPS Signatures:</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-search text-info"></i> Port scan detection rules</li>
+                        <li><i class="fas fa-search text-info"></i> Connection rate monitoring</li>
+                        <li><i class="fas fa-search text-info"></i> SYN flood detection</li>
+                        <li><i class="fas fa-search text-info"></i> Stealth scan patterns</li>
+                    </ul>
+
+                    <h6 class="mt-3">Network Monitoring:</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-chart-line text-warning"></i> Traffic analysis</li>
+                        <li><i class="fas fa-chart-line text-warning"></i> Baseline deviation</li>
+                        <li><i class="fas fa-chart-line text-warning"></i> Anomaly detection</li>
+                        <li><i class="fas fa-chart-line text-warning"></i> Behavioral analysis</li>
+                    </ul>
+
+                    <h6 class="mt-3">Defensive Measures:</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-ban text-danger"></i> Rate limiting</li>
+                        <li><i class="fas fa-ban text-danger"></i> Connection throttling</li>
+                        <li><i class="fas fa-ban text-danger"></i> Blackhole routing</li>
+                        <li><i class="fas fa-ban text-danger"></i> Honeypot deployment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-tools"></i> Detection Tools</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Open Source Tools:</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-cog"></i> Snort/Suricata IDS</li>
+                        <li><i class="fas fa-cog"></i> OSSEC HIDS</li>
+                        <li><i class="fas fa-cog"></i> pfSense firewall</li>
+                        <li><i class="fas fa-cog"></i> Wireshark analysis</li>
+                    </ul>
+
+                    <h6 class="mt-3">Commercial Solutions:</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-building"></i> Cisco IPS</li>
+                        <li><i class="fas fa-building"></i> Palo Alto NGFW</li>
+                        <li><i class="fas fa-building"></i> Check Point firewall</li>
+                        <li><i class="fas fa-building"></i> FortiGate UTM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Scan Alerts</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning small py-2">
+                        <i class="fas fa-bell"></i> Stealth scan detected on {{ scan_info.target }}
+                    </div>
+                    <div class="alert alert-info small py-2">
+                        <i class="fas fa-info"></i> Unusual connection patterns observed
+                    </div>
+                    <div class="alert alert-danger small py-2">
+                        <i class="fas fa-exclamation-triangle"></i> Multiple decoy IPs identified
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-dark">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Notes:</h6>
+                <ul class="mb-0">
+                    <li><strong>Stealth Scanning:</strong> Advanced techniques designed to avoid detection by security systems and network monitoring tools.</li>
+                    <li><strong>SYN Stealth Scan:</strong> Uses half-open connections that don't complete the TCP handshake, making them harder to log.</li>
+                    <li><strong>Detection Challenges:</strong> Stealth scans can be distributed over time and use legitimate-looking traffic patterns.</li>
+                    <li><strong>Defense Strategy:</strong> Combine multiple detection methods and use behavioral analysis to identify scanning activity.</li>
+                </ul>
+            </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentProgress = 0;
+    let isScanning = false;
+    
+    // Update command preview when form changes
+    function updateCommandPreview() {
+        const target = document.getElementById('targetInput').value;
+        const technique = document.getElementById('techniqueSelect').value;
+        const timing = document.getElementById('timingSelect').value;
+        const ports = document.getElementById('portsInput').value;
+        
+        let command = 'nmap ';
+        
+        // Add technique flag
+        switch(technique) {
+            case 'SYN Stealth Scan':
+                command += '-sS ';
+                break;
+            case 'FIN Scan':
+                command += '-sF ';
+                break;
+            case 'Idle/Zombie Scan':
+                command += '-sI ';
+                break;
+            case 'Fragmented Packets':
+                command += '-f ';
+                break;
+        }
+        
+        command += `-${timing.toLowerCase()} `;
+        command += `--source-port 53 `;
+        command += `-p ${ports} `;
+        command += target;
+        
+        document.getElementById('commandPreview').textContent = command;
+    }
+    
+    // Form event listeners
+    document.getElementById('targetInput').addEventListener('input', updateCommandPreview);
+    document.getElementById('techniqueSelect').addEventListener('change', updateCommandPreview);
+    document.getElementById('timingSelect').addEventListener('change', updateCommandPreview);
+    document.getElementById('portsInput').addEventListener('input', updateCommandPreview);
+    
+    // Scan form submission
+    document.getElementById('stealthScanForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (isScanning) return;
+        
+        isScanning = true;
+        const runBtn = document.getElementById('runScanBtn');
+        const originalText = runBtn.innerHTML;
+        
+        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+        runBtn.disabled = true;
+        
+        // Show progress
+        document.getElementById('scanProgress').style.display = 'block';
+        document.getElementById('scanStatus').innerHTML = '<div class="alert alert-info"><i class="fas fa-cogs fa-spin"></i> Initializing stealth scan...</div>';
+        
+        const formData = {
+            target: document.getElementById('targetInput').value,
+            technique: document.getElementById('techniqueSelect').value,
+            timing: document.getElementById('timingSelect').value,
+            ports: document.getElementById('portsInput').value
+        };
+        
+        fetch('/port_scanner/run_stealth_scan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                simulateScanProgress(data.results);
+            } else {
+                showError(data.error || 'Scan failed');
+            }
+        })
+        .catch(error => {
+            showError('Network error: ' + error.message);
+        })
+        .finally(() => {
+            setTimeout(() => {
+                runBtn.innerHTML = originalText;
+                runBtn.disabled = false;
+                isScanning = false;
+            }, 3000);
+        });
+    });
+    
+    function simulateScanProgress(results) {
+        let progress = 0;
+        const progressBar = document.getElementById('progressBar');
+        const statusDiv = document.getElementById('scanStatus');
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 15 + 5;
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+            
+            if (progress < 30) {
+                statusDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-search"></i> Probing target...</div>';
+            } else if (progress < 70) {
+                statusDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-network-wired"></i> Scanning ports...</div>';
+            } else if (progress < 100) {
+                statusDiv.innerHTML = '<div class="alert alert-primary"><i class="fas fa-chart-line"></i> Analyzing results...</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> Scan completed successfully!</div>';
+                showResults(results);
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+    
+    function showResults(results) {
+        const resultsDiv = document.getElementById('scanResults');
+        let html = '<div class="mt-3"><h6>Scan Results:</h6>';
+        html += '<div class="table-responsive"><table class="table table-sm">';
+        html += '<thead><tr><th>Port</th><th>State</th><th>Service</th><th>Method</th></tr></thead><tbody>';
+        
+        results.forEach(result => {
+            const statusClass = result.status === 'open' ? 'table-success' : 
+                              result.status === 'filtered' ? 'table-warning' : 'table-secondary';
+            const statusBadge = result.status === 'open' ? 'bg-success' : 
+                              result.status === 'filtered' ? 'bg-warning' : 'bg-secondary';
+            
+            html += `<tr class="${statusClass}">
+                <td>${result.port}</td>
+                <td><span class="badge ${statusBadge}">${result.status}</span></td>
+                <td>${result.service}</td>
+                <td>Stealth</td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table></div>';
+        html += `<div class="alert alert-info mt-2">
+            <strong>Detection Risk:</strong> Low<br>
+            <strong>Scan Duration:</strong> 2.3 seconds<br>
+            <strong>Packets Sent:</strong> ${results.length * 2}
+        </div></div>`;
+        
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = 'block';
+    }
+    
+    function showError(message) {
+        document.getElementById('scanStatus').innerHTML = 
+            `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+        document.getElementById('scanProgress').style.display = 'none';
+    }
+    
+    // Initialize command preview
+    updateCommandPreview();
+});
+</script>
+{% endblock %}

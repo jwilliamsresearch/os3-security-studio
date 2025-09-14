@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}DNS Cache Poisoning Demo - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-virus text-danger"></i> DNS Cache Poisoning Attack Simulation</h2>
+                    <p class="text-muted">Educational demonstration of DNS cache poisoning vulnerabilities</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('dns_security.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to DNS Security
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> DNS Cache Poisoning in Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Educational Simulation:</strong> This is a simulated attack for learning purposes only.
+                    </div>
+
+                    <h6>Attack Scenario: {{ scenario.name }}</h6>
+                    <p class="text-muted">{{ scenario.description }}</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-server"></i> Legitimate DNS Response</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Domain:</strong> {{ scenario.target_domain }}</p>
+                                    <p><strong>Real IP:</strong> <span class="text-success">{{ scenario.legitimate_ip }}</span></p>
+                                    <p><strong>TTL:</strong> {{ scenario.legitimate_ttl }}s</p>
+                                    <small class="text-muted">Normal DNS resolution</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-danger text-white">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-skull-crossbones"></i> Poisoned DNS Response</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Domain:</strong> {{ scenario.target_domain }}</p>
+                                    <p><strong>Malicious IP:</strong> <span class="text-warning">{{ scenario.malicious_ip }}</span></p>
+                                    <p><strong>TTL:</strong> {{ scenario.malicious_ttl }}s</p>
+                                    <small>Injected by attacker</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Attack Timeline:</h6>
+                        <div class="timeline">
+                            {% for step in scenario.timeline %}
+                            <div class="d-flex mb-2">
+                                <div class="me-2">
+                                    <span class="badge bg-secondary">{{ loop.index }}</span>
+                                </div>
+                                <div>
+                                    <strong>{{ step.time }}</strong> - {{ step.action }}
+                                    {% if step.impact %}
+                                    <br><small class="text-danger">Impact: {{ step.impact }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6>Cache Status:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-danger" style="width: {{ scenario.poison_percentage }}%">
+                                {{ scenario.poison_percentage }}% Poisoned
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Cached entries pointing to malicious IP: {{ scenario.poisoned_entries }}/{{ scenario.total_entries }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-shield-alt"></i> Mitigation Strategies</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Preventive Measures:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Implement DNSSEC validation</li>
+                        <li><i class="fas fa-check text-success"></i> Use secure DNS resolvers (DoH/DoT)</li>
+                        <li><i class="fas fa-check text-success"></i> Configure DNS source port randomization</li>
+                        <li><i class="fas fa-check text-success"></i> Monitor DNS query patterns</li>
+                        <li><i class="fas fa-check text-success"></i> Implement DNS filtering</li>
+                    </ul>
+
+                    <h6 class="mt-3">Detection Methods:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-search text-info"></i> Monitor for unusual DNS responses</li>
+                        <li><i class="fas fa-search text-info"></i> Check for mismatched IP addresses</li>
+                        <li><i class="fas fa-search text-info"></i> Analyze DNS query logs</li>
+                        <li><i class="fas fa-search text-info"></i> Implement baseline monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-info-circle"></i> Learning Objectives</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small">
+                        <li>Understand DNS cache poisoning mechanics</li>
+                        <li>Learn about DNS security vulnerabilities</li>
+                        <li>Explore attack vectors and timing</li>
+                        <li>Discover defense strategies</li>
+                        <li>Practice incident response</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Notes:</h6>
+                <ul class="mb-0">
+                    <li><strong>DNS Cache Poisoning:</strong> Attackers inject malicious DNS records into DNS caches, redirecting traffic to attacker-controlled servers.</li>
+                    <li><strong>Impact:</strong> Users may be redirected to phishing sites, malware, or have their communications intercepted.</li>
+                    <li><strong>Prevention:</strong> DNSSEC provides cryptographic validation of DNS responses, preventing cache poisoning attacks.</li>
+                    <li><strong>Real-world Examples:</strong> The Kaminsky DNS attack (2008) exposed widespread vulnerabilities in DNS implementations.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh simulation data
+function updateSimulation() {
+    // In a real implementation, this would fetch updated data
+    console.log('DNS poisoning simulation running...');
+}
+
+// Update every 5 seconds
+setInterval(updateSimulation, 5000);
+</script>
+{% endblock %}

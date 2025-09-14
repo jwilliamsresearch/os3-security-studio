@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Firewall Logs - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-list-alt text-info"></i> Firewall Log Analysis</h2>
+                    <p class="text-muted">Monitor and analyze firewall activity and blocked traffic</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('firewall_sim.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Firewall
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-stream"></i> Real-time Firewall Logs
+                        <span class="badge bg-light text-dark ms-2">{{ logs|length }} entries</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Source</th>
+                                    <th>Destination</th>
+                                    <th>Protocol</th>
+                                    <th>Rule</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr class="log-entry" data-action="{{ log.action }}">
+                                    <td class="small">{{ log.timestamp }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ log.action_color }}">
+                                            {{ log.action }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <code class="small">{{ log.source_ip }}:{{ log.source_port }}</code>
+                                    </td>
+                                    <td>
+                                        <code class="small">{{ log.dest_ip }}:{{ log.dest_port }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ log.protocol }}</span>
+                                    </td>
+                                    <td class="small">{{ log.rule_name }}</td>
+                                    <td class="small">
+                                        {{ log.details }}
+                                        {% if log.threat_level %}
+                                        <span class="badge bg-{{ log.threat_color }} ms-1">{{ log.threat_level }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="filterLogs('all')">All</button>
+                                <button class="btn btn-sm btn-outline-success" onclick="filterLogs('ALLOW')">Allow</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="filterLogs('DENY')">Deny</button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="filterLogs('LOG')">Log</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i> Clear Logs
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="exportLogs()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="refreshLogs()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-bar"></i> Log Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-12 mb-2">
+                            <div class="border rounded p-2 bg-success text-white">
+                                <h5 id="allow-count">{{ log_stats.allow_count }}</h5>
+                                <small>Allowed</small>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-2">
+                            <div class="border rounded p-2 bg-danger text-white">
+                                <h5 id="deny-count">{{ log_stats.deny_count }}</h5>
+                                <small>Denied</small>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-2">
+                            <div class="border rounded p-2 bg-warning text-dark">
+                                <h5 id="log-count">{{ log_stats.log_count }}</h5>
+                                <small>Logged</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-3">Activity Rate:</h6>
+                    <div class="d-flex justify-content-between">
+                        <span>Last Hour:</span>
+                        <span class="badge bg-primary">{{ log_stats.last_hour }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Last 24 Hours:</span>
+                        <span class="badge bg-info">{{ log_stats.last_24h }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Top Threats</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Blocked Sources:</h6>
+                    <ul class="list-unstyled small">
+                        {% for threat in top_threats.sources %}
+                        <li class="d-flex justify-content-between mb-1">
+                            <span><code>{{ threat.ip }}</code></span>
+                            <span class="badge bg-danger">{{ threat.count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Target Ports:</h6>
+                    <ul class="list-unstyled small">
+                        {% for port in top_threats.ports %}
+                        <li class="d-flex justify-content-between mb-1">
+                            <span>Port {{ port.number }}</span>
+                            <span class="badge bg-warning">{{ port.count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Attack Types:</h6>
+                    <ul class="list-unstyled small">
+                        {% for attack in top_threats.attacks %}
+                        <li class="d-flex justify-content-between mb-1">
+                            <span>{{ attack.type }}</span>
+                            <span class="badge bg-secondary">{{ attack.count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-search"></i> Log Search</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Search IP:</label>
+                        <input type="text" class="form-control form-control-sm" id="search-ip" 
+                               placeholder="192.168.1.100" onkeyup="searchLogs()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Search Port:</label>
+                        <input type="number" class="form-control form-control-sm" id="search-port" 
+                               placeholder="80" onkeyup="searchLogs()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Time Range:</label>
+                        <select class="form-select form-select-sm" id="time-range" onchange="searchLogs()">
+                            <option value="all">All Time</option>
+                            <option value="1h">Last Hour</option>
+                            <option value="24h">Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-sm btn-primary w-100" onclick="searchLogs()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-bell"></i> Alerts</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger small py-2 mb-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        High volume of denied connections from 192.168.1.200
+                    </div>
+                    <div class="alert alert-warning small py-2 mb-2">
+                        <i class="fas fa-info-circle"></i>
+                        Unusual port scanning activity detected
+                    </div>
+                    <div class="alert alert-info small py-2 mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        Traffic volume 20% above baseline
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-graduation-cap"></i> Log Analysis Best Practices:</h6>
+                <ul class="mb-0">
+                    <li><strong>Regular Monitoring:</strong> Review firewall logs daily to identify threats and optimize rules.</li>
+                    <li><strong>Pattern Recognition:</strong> Look for unusual patterns in denied traffic that may indicate attacks.</li>
+                    <li><strong>Performance Impact:</strong> Monitor allowed traffic to ensure rules aren't causing bottlenecks.</li>
+                    <li><strong>Compliance:</strong> Maintain logs for audit requirements and incident response procedures.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterLogs(action) {
+    const rows = document.querySelectorAll('.log-entry');
+    rows.forEach(row => {
+        if (action === 'all' || row.dataset.action === action) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Update button states
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function searchLogs() {
+    const searchIp = document.getElementById('search-ip').value.toLowerCase();
+    const searchPort = document.getElementById('search-port').value;
+    const timeRange = document.getElementById('time-range').value;
+    
+    const rows = document.querySelectorAll('.log-entry');
+    rows.forEach(row => {
+        let show = true;
+        
+        if (searchIp) {
+            const sourceText = row.children[2].textContent.toLowerCase();
+            const destText = row.children[3].textContent.toLowerCase();
+            if (!sourceText.includes(searchIp) && !destText.includes(searchIp)) {
+                show = false;
+            }
+        }
+        
+        if (searchPort && show) {
+            const sourceText = row.children[2].textContent;
+            const destText = row.children[3].textContent;
+            if (!sourceText.includes(':' + searchPort) && !destText.includes(':' + searchPort)) {
+                show = false;
+            }
+        }
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+function clearLogs() {
+    if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+        // In a real implementation, this would make an AJAX call to clear logs
+        alert('Logs cleared successfully.');
+        location.reload();
+    }
+}
+
+function exportLogs() {
+    alert('Exporting firewall logs...\n\nIn a real system, this would download logs in CSV or JSON format for analysis.');
+}
+
+function refreshLogs() {
+    // In a real implementation, this would fetch new logs via AJAX
+    alert('Refreshing logs...');
+    location.reload();
+}
+
+// Auto-refresh logs every 30 seconds
+setInterval(function() {
+    // In a real implementation, this would fetch new logs via AJAX
+    console.log('Auto-refreshing firewall logs...');
+}, 30000);
+
+// Simulate real-time log updates
+function simulateNewLogEntry() {
+    // In a real implementation, this would use WebSockets or polling
+    console.log('Simulating new log entry...');
+}
+
+// Add new log entries every few seconds for demonstration
+setInterval(simulateNewLogEntry, 5000);
+</script>
+{% endblock %}

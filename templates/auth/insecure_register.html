@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Insecure Registration{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE REGISTRATION - Weak Password Policy</h4>
+            <p class="mb-0">This registration form accepts any password, making accounts vulnerable to attacks.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5>Create Account (Insecure)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username:</label>
+                                <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" name="password" required>
+                                <div class="form-text text-danger">No password requirements!</div>
+                            </div>
+                            <button type="submit" class="btn btn-danger">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h6><i class="fas fa-bug"></i> Security Issues</h6>
+                    </div>
+                    <div class="card-body">
+                        <h6>Missing Protections:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-times text-danger"></i> No minimum length</li>
+                            <li><i class="fas fa-times text-danger"></i> No complexity requirements</li>
+                            <li><i class="fas fa-times text-danger"></i> Accepts weak passwords</li>
+                            <li><i class="fas fa-times text-danger"></i> No common password blocking</li>
+                        </ul>
+
+                        <h6 class="mt-3">Try These Weak Passwords:</h6>
+                        <div class="list-group list-group-flush">
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="123">
+                                <code>123</code> - Too short
+                            </button>
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="password">
+                                <code>password</code> - Common password
+                            </button>
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="abc">
+                                <code>abc</code> - No numbers/symbols
+                            </button>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{{ url_for('auth.secure_register') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-shield-alt"></i> See Secure Version
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPassword(password) {
+    document.querySelector('input[name="password"]').value = password;
+}
+</script>
+{% endblock %}

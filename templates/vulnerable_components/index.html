@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Vulnerable Components Demo - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-cubes"></i> Vulnerable and Outdated Components</h5>
+<p><strong>What is it?</strong> Using components with known vulnerabilities, outdated libraries, or insecure dependencies that expose applications to attacks.</p>
+
+<h6>Common Issues:</h6>
+<ul>
+    <li><strong>Outdated Dependencies:</strong> Using old versions with known CVEs</li>
+    <li><strong>Insecure Deserialization:</strong> Unsafe pickle, YAML loading</li>
+    <li><strong>Vulnerable Libraries:</strong> Third-party code with security flaws</li>
+    <li><strong>Supply Chain Attacks:</strong> Compromised dependencies</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>Regularly update dependencies</li>
+    <li>Use dependency scanning tools</li>
+    <li>Monitor CVE databases</li>
+    <li>Use safe deserialization methods</li>
+    <li>Implement Software Bill of Materials (SBOM)</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-cubes"></i> Vulnerable and Outdated Components</h2>
+        <p class="lead">Explore how vulnerable dependencies and insecure deserialization can compromise applications.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-exclamation-triangle"></i> Dependency Vulnerabilities</h5>
+            </div>
+            <div class="card-body">
+                <p>Check how outdated libraries expose applications to known security vulnerabilities.</p>
+                <div class="code-block">
+                    <code>requests==2.19.1  # CVE-2018-18074<br>
+                    PyYAML==3.12     # CVE-2017-18342</code>
+                </div>
+                <a href="{{ url_for('vulnerable_components.outdated_libs') }}" class="btn btn-warning">Check Dependencies</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-bomb"></i> Insecure Deserialization</h5>
+            </div>
+            <div class="card-body">
+                <p>See how unsafe deserialization of YAML and Pickle data can lead to remote code execution.</p>
+                <div class="code-block">
+                    <code>yaml.load(untrusted_data)  # Dangerous!<br>
+                    pickle.loads(user_input)   # RCE risk!</code>
+                </div>
+                <a href="{{ url_for('vulnerable_components.insecure_deserialization') }}" class="btn btn-danger">Try Deserialization</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> OWASP Top 10 2021: A06 - Vulnerable and Outdated Components</h5>
+    <p>This vulnerability occurs when applications use components with known vulnerabilities. It's particularly dangerous because:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Common Scenarios:</strong></p>
+            <ul class="mb-0">
+                <li>Outdated frameworks and libraries</li>
+                <li>Unsupported or deprecated components</li>
+                <li>Components from untrusted sources</li>
+                <li>Lack of dependency monitoring</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Impact:</strong></p>
+            <ul class="mb-0">
+                <li>Remote code execution</li>
+                <li>Data breaches</li>
+                <li>Complete system compromise</li>
+                <li>Supply chain attacks</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Security Best Practices</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-sync-alt"></i> Dependency Management</h6>
+                        <ul>
+                            <li>Regular updates</li>
+                            <li>Automated scanning</li>
+                            <li>Version pinning</li>
+                            <li>Security advisories</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-lock"></i> Safe Deserialization</h6>
+                        <ul>
+                            <li>Use safe loaders (yaml.safe_load)</li>
+                            <li>Validate input data</li>
+                            <li>Avoid pickle for untrusted data</li>
+                            <li>Use JSON when possible</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-tools"></i> Security Tools</h6>
+                        <ul>
+                            <li>OWASP Dependency Check</li>
+                            <li>Snyk vulnerability scanner</li>
+                            <li>GitHub security alerts</li>
+                            <li>Supply chain monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <h5><i class="fas fa-lightbulb"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand how vulnerable dependencies impact security</li>
+        <li>Learn to identify and mitigate component vulnerabilities</li>
+        <li>Practice safe deserialization techniques</li>
+        <li>Implement dependency monitoring and management</li>
+    </ul>
+</div>
+{% endblock %}

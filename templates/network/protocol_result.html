@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Protocol Transmission Result - OS³{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-{{ 'shield-alt' if security_level == 'secure' else 'exclamation-triangle' }}"></i> 
+            {{ 'HTTPS' if security_level == 'secure' else 'HTTP' }} Transmission Result</h2>
+        
+        {% if security_level == 'insecure' %}
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-exclamation-triangle"></i> HTTP Transmission - Data Intercepted!</h5>
+            <p>Your login attempt was transmitted in plain text and has been captured by our simulation. 
+            In a real attack, this data would now be compromised.</p>
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            <h5><i class="fas fa-lock"></i> HTTPS Transmission - Data Protected!</h5>
+            <p>Your login attempt was encrypted using SSL/TLS. Even if intercepted, 
+            the data remains unreadable to attackers.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if security_level == 'insecure' %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-eye"></i> What an Attacker Sees</h5>
+            </div>
+            <div class="card-body">
+                <h6>HTTP Request Headers:</h6>
+                <div class="code-block">
+                    <small>
+                        {{ traffic_data.method }} {{ traffic_data.url }} {{ traffic_data.protocol }}<br>
+                        Host: cyberlab.newman.ac.uk<br>
+                        User-Agent: {{ traffic_data.user_agent[:50] }}...<br>
+                        Content-Type: application/x-www-form-urlencoded<br>
+                        Content-Length: {{ (traffic_data.form_data.username|length + traffic_data.form_data.password|length + 20) }}<br>
+                        Connection: keep-alive
+                    </small>
+                </div>
+                
+                <h6 class="mt-3">Form Data (Plain Text):</h6>
+                <div class="alert alert-danger">
+                    <strong>Username:</strong> <code>{{ traffic_data.form_data.username }}</code><br>
+                    <strong>Password:</strong> <code>{{ traffic_data.form_data.password }}</code>
+                </div>
+                
+                <h6>Network Information:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Source IP:</strong> {{ traffic_data.source_ip }}</li>
+                    <li><strong>Timestamp:</strong> {{ traffic_data.timestamp }}</li>
+                    <li><strong>Protocol:</strong> {{ traffic_data.protocol }}</li>
+                    <li><strong>Encryption:</strong> <span class="text-danger">None</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-exclamation-circle"></i> Attack Scenarios</h5>
+            </div>
+            <div class="card-body">
+                <h6>How this data could be exploited:</h6>
+                <ul>
+                    <li><strong>Account Takeover:</strong> Attacker gains access to user account</li>
+                    <li><strong>Credential Stuffing:</strong> Testing credentials on other sites</li>
+                    <li><strong>Social Engineering:</strong> Using personal info for targeted attacks</li>
+                    <li><strong>Corporate Espionage:</strong> Access to business systems</li>
+                </ul>
+                
+                <h6>Common Interception Methods:</h6>
+                <ul>
+                    <li><strong>Wi-Fi Eavesdropping:</strong> Monitoring public networks</li>
+                    <li><strong>Packet Sniffing:</strong> Using tools like Wireshark</li>
+                    <li><strong>Man-in-the-Middle:</strong> Positioning between client/server</li>
+                    <li><strong>DNS Spoofing:</strong> Redirecting to malicious servers</li>
+                </ul>
+                
+                <div class="alert alert-info mt-3">
+                    <small><i class="fas fa-info-circle"></i> This data has been stored in our intercepted traffic log for educational purposes.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-lock"></i> Encrypted Transmission</h5>
+            </div>
+            <div class="card-body">
+                <h6>What an Attacker Sees:</h6>
+                <div class="code-block">
+                    <small class="text-muted">
+                        HTTPS/1.1 443 Encrypted<br>
+                        TLS Handshake: {{ traffic_data.ssl_info.protocol }}<br>
+                        Cipher: {{ traffic_data.ssl_info.cipher_suite }}<br>
+                        <br>
+                        <span class="text-success">{{ traffic_data.encrypted_payload[:60] }}...</span><br>
+                        <em>(Encrypted - Unreadable)</em>
+                    </small>
+                </div>
+                
+                <h6 class="mt-3">SSL/TLS Information:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Protocol:</strong> {{ traffic_data.ssl_info.protocol }}</li>
+                    <li><strong>Cipher Suite:</strong> {{ traffic_data.ssl_info.cipher_suite }}</li>
+                    <li><strong>Key Exchange:</strong> {{ traffic_data.ssl_info.key_exchange }}</li>
+                    <li><strong>Authentication:</strong> {{ traffic_data.ssl_info.authentication }}</li>
+                    <li><strong>Encryption:</strong> {{ traffic_data.ssl_info.bulk_encryption }}</li>
+                    <li><strong>Session ID:</strong> <code>{{ traffic_data.session_id }}</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-certificate"></i> Certificate Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Server Certificate:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Issuer:</strong> {{ traffic_data.ssl_info.certificate.issuer }}</li>
+                    <li><strong>Subject:</strong> {{ traffic_data.ssl_info.certificate.subject }}</li>
+                    <li><strong>Valid From:</strong> {{ traffic_data.ssl_info.certificate.valid_from }}</li>
+                    <li><strong>Valid To:</strong> {{ traffic_data.ssl_info.certificate.valid_to }}</li>
+                    <li><strong>Fingerprint:</strong> <code>{{ traffic_data.ssl_info.certificate.fingerprint }}</code></li>
+                </ul>
+                
+                <h6>Security Features:</h6>
+                <ul>
+                    <li><i class="fas fa-check text-success"></i> End-to-end encryption</li>
+                    <li><i class="fas fa-check text-success"></i> Server authentication</li>
+                    <li><i class="fas fa-check text-success"></i> Data integrity verification</li>
+                    <li><i class="fas fa-check text-success"></i> Forward secrecy</li>
+                    <li><i class="fas fa-check text-success"></i> Certificate validation</li>
+                </ul>
+                
+                <div class="alert alert-success mt-3">
+                    <small><i class="fas fa-shield-alt"></i> Your data is protected against interception, tampering, and replay attacks.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-graduation-cap"></i> Learning Points</h5>
+            </div>
+            <div class="card-body">
+                {% if security_level == 'insecure' %}
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Key Takeaways from HTTP Transmission:</h6>
+                    <ul class="mb-0">
+                        <li>All data is transmitted in plain text and easily readable</li>
+                        <li>Passwords and sensitive information are completely exposed</li>
+                        <li>No way to verify server identity or data integrity</li>
+                        <li>Vulnerable to various man-in-the-middle attacks</li>
+                        <li>Should never be used for login forms or sensitive data</li>
+                    </ul>
+                </div>
+                {% else %}
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-lock"></i> Key Takeaways from HTTPS Transmission:</h6>
+                    <ul class="mb-0">
+                        <li>Data is encrypted and unreadable even if intercepted</li>
+                        <li>Server identity is verified through digital certificates</li>
+                        <li>Data integrity is ensured through cryptographic hashes</li>
+                        <li>Protected against most common network attacks</li>
+                        <li>Essential for any sensitive data transmission</li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('network_protocols.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Protocol Demo
+        </a>
+        <a href="{{ url_for('network_protocols.intercepted') }}" class="btn btn-warning">
+            <i class="fas fa-list"></i> View All Intercepted Traffic
+        </a>
+    </div>
+</div>
+
+<style>
+.code-block {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-family: 'Courier New', monospace;
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

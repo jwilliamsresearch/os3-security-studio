@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Network Forensics - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-search text-primary"></i> Network Forensics Scenarios</h2>
+                    <p class="text-muted">Digital investigation and incident response exercises</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('traffic_analysis.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Traffic Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for scenario in scenarios %}
+        <div class="col-md-6 mb-4">
+            <div class="card border-{{ scenario.difficulty_color }} h-100">
+                <div class="card-header bg-{{ scenario.difficulty_color }} text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-{{ scenario.icon }}"></i> {{ scenario.title }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-{{ scenario.difficulty_color }}">{{ scenario.difficulty }}</span>
+                        <span class="badge bg-secondary ms-1">{{ scenario.duration }}</span>
+                        <span class="badge bg-info ms-1">{{ scenario.category }}</span>
+                    </div>
+                    
+                    <p class="card-text">{{ scenario.description }}</p>
+                    
+                    <h6>Investigation Objectives:</h6>
+                    <ul class="small">
+                        {% for objective in scenario.objectives %}
+                        <li>{{ objective }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h6>Evidence Available:</h6>
+                    <ul class="list-unstyled small">
+                        {% for evidence in scenario.evidence %}
+                        <li>
+                            <i class="fas fa-{{ evidence.icon }} text-{{ evidence.color }}"></i>
+                            {{ evidence.type }}: {{ evidence.description }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h6>Skills Required:</h6>
+                    <div class="mb-3">
+                        {% for skill in scenario.skills %}
+                        <span class="badge bg-outline-primary me-1">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('traffic_analysis.forensics_detail', scenario_id=scenario.id) }}" 
+                       class="btn btn-primary w-100">
+                        <i class="fas fa-play"></i> Start Investigation
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-primary">
+                <h6><i class="fas fa-graduation-cap"></i> Forensics Learning Path:</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>Beginner:</h6>
+                        <ul class="small mb-0">
+                            <li>Basic packet analysis</li>
+                            <li>Protocol identification</li>
+                            <li>Timeline reconstruction</li>
+                            <li>Evidence preservation</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Intermediate:</h6>
+                        <ul class="small mb-0">
+                            <li>Malware traffic analysis</li>
+                            <li>Attack pattern recognition</li>
+                            <li>Data correlation</li>
+                            <li>Artifact extraction</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Advanced:</h6>
+                        <ul class="small mb-0">
+                            <li>Advanced persistent threats</li>
+                            <li>Encrypted traffic analysis</li>
+                            <li>Attribution techniques</li>
+                            <li>Court-ready reporting</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Expert:</h6>
+                        <ul class="small mb-0">
+                            <li>Nation-state investigations</li>
+                            <li>Zero-day analysis</li>
+                            <li>Custom tool development</li>
+                            <li>Research methodologies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

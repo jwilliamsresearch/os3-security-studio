@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}File Upload - Secure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE VERSION - File Upload Protected</h4>
+            <p class="mb-0">This version validates file types and uses secure filename handling.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-upload"></i> File Upload (Protected)</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Choose file to upload:</label>
+                        <input type="file" class="form-control" name="file" required>
+                        <div class="form-text text-success">Only safe file types allowed!</div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-shield-alt"></i> Upload File (Secure)
+                    </button>
+                </form>
+
+                {% if files %}
+                <hr>
+                <h6>Your Uploaded Files:</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Original Filename</th>
+                                <th>Stored As (Secured)</th>
+                                <th>Upload Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in files %}
+                            <tr>
+                                <td>{{ file[1] }}</td>
+                                <td><code>{{ file[0] }}</code></td>
+                                <td>{{ file[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Secure Code:</h6>
+                <div class="code-block">
+                    <code>
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}<br><br>
+if not allowed_file(filename):<br>
+&nbsp;&nbsp;return "File type not allowed!"<br><br>
+filename = secure_filename(filename)<br>
+timestamp = str(int(time.time()))<br>
+filename = f"{name}_{timestamp}{ext}"
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Protection Methods:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> File type whitelist</li>
+                    <li><i class="fas fa-check text-success"></i> Secure filename generation</li>
+                    <li><i class="fas fa-check text-success"></i> Timestamp uniqueness</li>
+                    <li><i class="fas fa-check text-success"></i> Path traversal prevention</li>
+                </ul>
+
+                <h6 class="mt-3">Allowed File Types:</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><code>.txt</code></span>
+                        <small class="text-success">✓ Allowed</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><code>.pdf</code></span>
+                        <small class="text-success">✓ Allowed</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><code>.png, .jpg</code></span>
+                        <small class="text-success">✓ Allowed</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><code>.doc, .docx</code></span>
+                        <small class="text-success">✓ Allowed</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span><code>.php, .exe</code></span>
+                        <small class="text-danger">✗ Blocked</small>
+                    </div>
+                </div>
+
+                <h6 class="mt-3">Security Features:</h6>
+                <ul class="small">
+                    <li><strong>Filename sanitization:</strong> Removes dangerous characters</li>
+                    <li><strong>Timestamp appending:</strong> Prevents filename conflicts</li>
+                    <li><strong>Extension validation:</strong> Only safe file types accepted</li>
+                    <li><strong>Size limits:</strong> 16MB maximum file size</li>
+                </ul>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('file_upload_insecure') }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

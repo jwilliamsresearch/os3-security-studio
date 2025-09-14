@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Secure DNS Demo - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-shield-alt text-success"></i> Secure DNS Implementations</h2>
+                    <p class="text-muted">DNS over HTTPS (DoH) and DNS over TLS (DoT) demonstrations</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('dns_security.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to DNS Security
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lock"></i> DNS over HTTPS (DoH)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Configuration:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Provider:</strong> {{ doh_config.provider }}</li>
+                        <li><strong>Endpoint:</strong> <code>{{ doh_config.endpoint }}</code></li>
+                        <li><strong>Port:</strong> {{ doh_config.port }}</li>
+                        <li><strong>Protocol:</strong> HTTPS</li>
+                        <li><strong>Encryption:</strong> TLS 1.3</li>
+                    </ul>
+
+                    <h6 class="mt-3">Security Features:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> End-to-end encryption</li>
+                        <li><i class="fas fa-check text-success"></i> Certificate validation</li>
+                        <li><i class="fas fa-check text-success"></i> Privacy protection</li>
+                        <li><i class="fas fa-check text-success"></i> Tampering prevention</li>
+                        <li><i class="fas fa-check text-success"></i> ISP query hiding</li>
+                    </ul>
+
+                    <div class="mt-3">
+                        <h6>Test Query:</h6>
+                        <div class="bg-light p-2 rounded">
+                            <code>
+                                POST {{ doh_config.endpoint }}<br>
+                                Content-Type: application/dns-message<br>
+                                Accept: application/dns-message<br>
+                                <br>
+                                Query: {{ test_query.domain }} ({{ test_query.record_type }})
+                            </code>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Response:</h6>
+                        <div class="bg-success text-white p-2 rounded">
+                            <small>
+                                Status: 200 OK<br>
+                                Response Time: {{ test_query.response_time }}ms<br>
+                                Record: {{ test_query.result }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> DNS over TLS (DoT)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Configuration:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Provider:</strong> {{ dot_config.provider }}</li>
+                        <li><strong>Server:</strong> <code>{{ dot_config.server }}</code></li>
+                        <li><strong>Port:</strong> {{ dot_config.port }}</li>
+                        <li><strong>Protocol:</strong> TLS</li>
+                        <li><strong>Authentication:</strong> Certificate-based</li>
+                    </ul>
+
+                    <h6 class="mt-3">Security Features:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-info"></i> Transport layer encryption</li>
+                        <li><i class="fas fa-check text-info"></i> Server authentication</li>
+                        <li><i class="fas fa-check text-info"></i> Query privacy</li>
+                        <li><i class="fas fa-check text-info"></i> Integrity protection</li>
+                        <li><i class="fas fa-check text-info"></i> Man-in-the-middle prevention</li>
+                    </ul>
+
+                    <div class="mt-3">
+                        <h6>Connection Details:</h6>
+                        <div class="bg-light p-2 rounded">
+                            <code>
+                                TLS Handshake: ✓ Success<br>
+                                Cipher Suite: {{ dot_config.cipher_suite }}<br>
+                                Certificate: Valid<br>
+                                <br>
+                                Query: {{ test_query.domain }} ({{ test_query.record_type }})
+                            </code>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Response:</h6>
+                        <div class="bg-info text-white p-2 rounded">
+                            <small>
+                                Status: Success<br>
+                                Response Time: {{ test_query.response_time }}ms<br>
+                                Record: {{ test_query.result }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-certificate"></i> DNSSEC Validation</h6>
+                </div>
+                <div class="card-body">
+                    <h6>DNSSEC Status for {{ dnssec_info.domain }}:</h6>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>DNSSEC Enabled:</span>
+                            <span class="badge bg-{{ 'success' if dnssec_info.enabled else 'danger' }}">
+                                {{ 'YES' if dnssec_info.enabled else 'NO' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if dnssec_info.enabled %}
+                    <div class="small">
+                        <h6>Key Information:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>DS Record:</strong> {{ dnssec_info.ds_record }}</li>
+                            <li><strong>DNSKEY:</strong> {{ dnssec_info.dnskey[:50] }}...</li>
+                            <li><strong>Algorithm:</strong> {{ dnssec_info.algorithm }}</li>
+                            <li><strong>Key Length:</strong> {{ dnssec_info.key_length }} bits</li>
+                        </ul>
+                        
+                        <h6 class="mt-3">Validation Chain:</h6>
+                        <ul class="list-unstyled">
+                            {% for step in dnssec_info.validation_chain %}
+                            <li>
+                                <i class="fas fa-{{ 'check text-success' if step.valid else 'times text-danger' }}"></i>
+                                {{ step.description }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        This domain does not have DNSSEC enabled, making it vulnerable to DNS spoofing attacks.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-bar"></i> Performance Comparison</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Query Performance:</h6>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Traditional DNS:</span>
+                            <span class="badge bg-secondary">{{ performance.traditional_dns }}ms</span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-secondary" style="width: {{ (performance.traditional_dns / performance.max_time * 100)|round(1) }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>DNS over HTTPS:</span>
+                            <span class="badge bg-success">{{ performance.doh }}ms</span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ (performance.doh / performance.max_time * 100)|round(1) }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>DNS over TLS:</span>
+                            <span class="badge bg-info">{{ performance.dot }}ms</span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: {{ (performance.dot / performance.max_time * 100)|round(1) }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted mt-3">
+                        <i class="fas fa-info-circle"></i>
+                        Performance may vary based on network conditions and provider infrastructure.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-success">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Summary:</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>DNS over HTTPS (DoH):</h6>
+                        <ul class="small mb-0">
+                            <li>Uses standard HTTPS (port 443)</li>
+                            <li>Harder to block or filter</li>
+                            <li>Better privacy protection</li>
+                            <li>Can bypass network restrictions</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>DNS over TLS (DoT):</h6>
+                        <ul class="small mb-0">
+                            <li>Dedicated port (853)</li>
+                            <li>Easier to identify and manage</li>
+                            <li>Lower overhead than DoH</li>
+                            <li>Better for enterprise environments</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>DNSSEC:</h6>
+                        <ul class="small mb-0">
+                            <li>Cryptographic DNS validation</li>
+                            <li>Prevents cache poisoning</li>
+                            <li>Ensures response authenticity</li>
+                            <li>Detects tampering attempts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh DNS performance metrics
+function updateMetrics() {
+    // In a real implementation, this would fetch live performance data
+    console.log('Updating secure DNS metrics...');
+}
+
+// Update every 10 seconds
+setInterval(updateMetrics, 10000);
+</script>
+{% endblock %}

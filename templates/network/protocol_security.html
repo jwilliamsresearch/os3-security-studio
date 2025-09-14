@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}HTTP vs HTTPS Protocol Security - OS³{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-shield-alt"></i> HTTP vs HTTPS Protocol Security</h5>
+<p><strong>What is it?</strong> HTTP transmits data in plain text, while HTTPS encrypts data using SSL/TLS protocols to prevent interception and tampering.</p>
+
+<h6>HTTP Vulnerabilities:</h6>
+<ul>
+    <li>Data transmitted in plain text</li>
+    <li>Susceptible to man-in-the-middle attacks</li>
+    <li>No authentication of server identity</li>
+    <li>Data can be modified in transit</li>
+</ul>
+
+<h6>HTTPS Protection:</h6>
+<ul>
+    <li>End-to-end encryption using SSL/TLS</li>
+    <li>Server authentication via certificates</li>
+    <li>Data integrity verification</li>
+    <li>Protection against eavesdropping</li>
+</ul>
+
+<h6>Real-world Implications:</h6>
+<ul>
+    <li>Password theft on public Wi-Fi</li>
+    <li>Session hijacking attacks</li>
+    <li>Credit card data interception</li>
+    <li>Corporate espionage</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-shield-alt"></i> HTTP vs HTTPS Protocol Security</h2>
+        <p class="lead">Experience the difference between secure and insecure protocol transmission.</p>
+        
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Educational Demo:</strong> This simulation shows how data appears during transmission. 
+            In the HTTP demo, your "login" data will be captured to demonstrate vulnerability.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> HTTP - Insecure Transmission</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Vulnerability:</strong> All data sent in plain text, easily intercepted by attackers.</p>
+                
+                <div class="alert alert-danger">
+                    <small><i class="fas fa-eye"></i> <strong>Warning:</strong> This form simulates HTTP transmission. Data will be "intercepted" for educational purposes.</small>
+                </div>
+                
+                <form method="POST" action="{{ url_for('network_protocols.insecure') }}">
+                    <div class="mb-3">
+                        <label for="http_username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="http_username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="http_password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="http_password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-in-alt"></i> Login via HTTP (Insecure)
+                    </button>
+                </form>
+                
+                <div class="mt-3">
+                    <h6>What an attacker sees:</h6>
+                    <div class="code-block">
+                        <small>
+                            POST /login HTTP/1.1<br>
+                            Host: example.com<br>
+                            Content-Type: application/x-www-form-urlencoded<br>
+                            <br>
+                            <span class="text-danger">username=admin&password=secret123</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-lock"></i> HTTPS - Secure Transmission</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Protection:</strong> Data encrypted using SSL/TLS protocols, unreadable to attackers.</p>
+                
+                <div class="alert alert-success">
+                    <small><i class="fas fa-shield-alt"></i> <strong>Secure:</strong> This form simulates HTTPS encryption. Data is protected during transmission.</small>
+                </div>
+                
+                <form method="POST" action="{{ url_for('network_protocols.secure') }}">
+                    <div class="mb-3">
+                        <label for="https_username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="https_username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="https_password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="https_password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-lock"></i> Login via HTTPS (Secure)
+                    </button>
+                </form>
+                
+                <div class="mt-3">
+                    <h6>What an attacker sees:</h6>
+                    <div class="code-block">
+                        <small>
+                            <span class="text-success">17 03 03 00 13 8a 7f 5c 91 0b 2e 4f 3c<br>
+                            6d 1a 8e ff 29 3b 7a 42 85 9c 17 03 03<br>
+                            00 35 a2 f4 ...</span><br>
+                            <em>(Encrypted data - unreadable)</em>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Protocol Comparison</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th class="text-danger">HTTP</th>
+                                <th class="text-success">HTTPS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Encryption</strong></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> None</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> SSL/TLS</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Port</strong></td>
+                                <td>80</td>
+                                <td>443</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Authentication</strong></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> None</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> Certificate-based</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Integrity</strong></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> Not guaranteed</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> Cryptographic verification</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SEO Impact</strong></td>
+                                <td><span class="text-warning">Lower ranking</span></td>
+                                <td><span class="text-success">Higher ranking</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-eye"></i> View Intercepted Traffic</h5>
+            </div>
+            <div class="card-body">
+                <p>See what an attacker could capture from HTTP transmissions in this session.</p>
+                <a href="{{ url_for('network_protocols.intercepted') }}" class="btn btn-warning">
+                    <i class="fas fa-list"></i> View Intercepted Data
+                </a>
+                <a href="{{ url_for('network_protocols.test_add_traffic') }}" class="btn btn-info btn-sm">
+                    <i class="fas fa-plus"></i> Add Test Data
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-secret"></i> MITM Attack Simulation</h5>
+            </div>
+            <div class="card-body">
+                <p>Learn about man-in-the-middle attacks and how HTTPS prevents them.</p>
+                <a href="{{ url_for('network_protocols.mitm_simulation') }}" class="btn btn-info">
+                    <i class="fas fa-network-wired"></i> Learn About MITM
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.code-block {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-family: 'Courier New', monospace;
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

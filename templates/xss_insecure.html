@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}XSS - Insecure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE VERSION - XSS Vulnerable</h4>
+            <p class="mb-0">This version displays user input without sanitization. Try injecting scripts!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Comment System (Vulnerable)</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Post a comment:</label>
+                        <textarea class="form-control" name="comment" rows="3" placeholder="Enter your comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+
+                <hr>
+
+                <h6>Comments:</h6>
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment[1] }}</strong>
+                                <small class="text-muted">{{ comment[2] }}</small>
+                            </div>
+                            <!-- VULNERABLE: Raw HTML output without sanitization -->
+                            <div class="mt-2">{{ comment[0] | safe }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerable Code:</h6>
+                <div class="code-block">
+                    <code>
+{{ '{{ comment[0] | safe }}' }}
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Try These XSS Payloads:</h6>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<script>alert('Basic XSS!');</script>">
+                        <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code><br>
+                        <small class="text-muted">Basic script injection</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<img src=x onerror=alert('Image XSS')>">
+                        <code>&lt;img src=x onerror=alert('XSS')&gt;</code><br>
+                        <small class="text-muted">Image error event</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<svg onload=alert('SVG XSS')></svg>">
+                        <code>&lt;svg onload=alert('XSS')&gt;</code><br>
+                        <small class="text-muted">SVG onload event</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<iframe src=javascript:alert('Iframe XSS')></iframe>">
+                        <code>&lt;iframe src=javascript:alert('XSS')&gt;</code><br>
+                        <small class="text-muted">Iframe JavaScript URL</small>
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('xss_secure') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-shield-alt"></i> See Secure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPayload(payload) {
+    document.querySelector('textarea[name="comment"]').value = payload;
+}
+</script>
+{% endblock %}

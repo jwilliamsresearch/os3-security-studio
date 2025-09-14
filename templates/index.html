@@ -1,0 +1,916 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Educational Cyber Security Platform</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="gradient-text">Open Source Security Studio</span>
+            </h1>
+            <p class="hero-subtitle">
+                Master cyber security through hands-on learning with OS³ - a comprehensive educational platform 
+                featuring interactive labs, vulnerability assessments, and defensive security training.
+            </p>
+            <div class="hero-buttons">
+                <a href="#content-section" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Start Learning Now
+                </a>
+                <a href="#modules" class="btn btn-secondary">
+                    <i class="fas fa-list"></i>
+                    Browse Modules
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Security Modules</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Interactive Labs</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Open Source</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn-close"></span>
+                        <span class="btn-minimize"></span>
+                        <span class="btn-maximize"></span>
+                    </div>
+                    <span class="terminal-title">OS³ Security Lab</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="prompt">os3@security-lab:~$</span>
+                        <span class="command">python app.py</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output success">✓ OS³ Security Studio Initialized</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output">🔒 Loading Security Modules...</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output">🛡️  Port Scanner Module: Active</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output">🔍 Vulnerability Scanner: Ready</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output">🌐 Network Analysis: Online</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="output success">🚀 Server running at http://localhost:5000</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="prompt">os3@security-lab:~$</span>
+                        <span class="cursor">█</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* CSS Variables */
+:root {
+    --primary-color: #3b82f6;
+    --secondary-color: #1f2937;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --container-max-width: 1200px;
+    --border-radius-lg: 1rem;
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s ease;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, 'Liberation Mono', monospace;
+}
+
+/* Hero Section */
+.hero {
+    padding: 8rem 0 6rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23e2e8f0" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.5;
+}
+
+.hero-container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+    background: #f9fafb;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Terminal Window */
+.terminal-window {
+    background: var(--secondary-color);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+    transition: var(--transition);
+}
+
+.terminal-window:hover {
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+.terminal-header {
+    background: #374151;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-buttons span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.btn-close { background: #ef4444; }
+.btn-minimize { background: #f59e0b; }
+.btn-maximize { background: #10b981; }
+
+.terminal-title {
+    color: #d1d5db;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.terminal-body {
+    padding: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.terminal-line {
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.prompt {
+    color: #10b981;
+    font-weight: 500;
+}
+
+.command {
+    color: #60a5fa;
+}
+
+.output {
+    color: #d1d5db;
+}
+
+.output.success {
+    color: #10b981;
+}
+
+.cursor {
+    animation: blink 1s infinite;
+    color: #60a5fa;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Main Content Styling */
+.main-content {
+    padding: 4rem 0;
+    background: #f8fafc;
+}
+
+.section {
+    margin-bottom: 6rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+    border-radius: 16px;
+    color: white;
+    font-size: 1.5rem;
+}
+
+/* Modern Lists */
+.modern-list {
+    list-style: none;
+    padding: 0;
+}
+
+.modern-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.modern-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.code-snippet {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+}
+
+/* Module Grid */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Module Cards */
+.module-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+    border: 1px solid #e5e7eb;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.module-card.coming-soon {
+    opacity: 0.7;
+}
+
+.module-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.module-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.module-header h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.module-badge {
+    background: #f3f4f6;
+    color: var(--text-muted);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.module-content {
+    padding: 1.5rem;
+}
+
+.module-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.module-content p:last-of-type {
+    margin-bottom: 1.5rem;
+}
+
+.module-content .text-muted {
+    font-size: 0.875rem;
+}
+
+/* Button Enhancements */
+.btn-outline-danger:hover,
+.btn-outline-warning:hover,
+.btn-outline-info:hover,
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-secondary:hover,
+.btn-outline-dark:hover {
+    transform: translateY(-1px);
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 1024px) {
+    .modules-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 2rem 0;
+    }
+    
+    .section {
+        margin-bottom: 4rem;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 4rem 0;
+    }
+    
+    .hero-container {
+        padding: 0 1rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+}
+</style>
+
+<!-- Main Content Section -->
+<div id="content-section" class="main-content">
+    <div class="container">
+        <!-- Usage Instructions -->
+        <section class="section">
+            <div class="feature-card bg-light border-0 shadow-sm">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="section-title">How to Master Cyber Security with OS³</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-play text-primary me-2"></i>Getting Started:</h5>
+                        <ul class="modern-list">
+                            <li>Each vulnerability has both <strong>insecure</strong> and <strong>secure</strong> implementations</li>
+                            <li>Start with the insecure version to understand the vulnerability</li>
+                            <li>Compare with the secure version to learn proper mitigation</li>
+                            <li>Use default test accounts: <code class="code-snippet">admin/admin123</code> or <code class="code-snippet">testuser/password</code></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-graduation-cap text-primary me-2"></i>Learning Features:</h5>
+                        <ul class="modern-list">
+                            <li>Click the <i class="fas fa-question-circle text-info"></i> icon for detailed explanations</li>
+                            <li>Interactive code examples with real-time testing</li>
+                            <li>Security best practices and mitigation strategies</li>
+                            <li>Real-world attack scenarios and prevention techniques</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network Security Section -->
+        <section class="section">
+            <div class="section-header">
+                <h3 class="section-title"><i class="fas fa-network-wired text-info me-2"></i>Network Security Phase</h3>
+                <p class="section-subtitle">Comprehensive network-based security topics and hands-on labs</p>
+            </div>
+
+            <div class="modules-grid">
+                <!-- HTTP vs HTTPS Protocol Security -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-danger">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>HTTP vs HTTPS Protocols</h4>
+                        <span class="module-badge">NET-PROTO-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Unencrypted HTTP traffic exposes sensitive data.</p>
+                        <p class="text-muted">Demonstrates man-in-the-middle attacks, traffic interception, and SSL/TLS protection.</p>
+                        <a href="{{ url_for('network_protocols.index') }}" class="btn btn-outline-danger btn-sm">Explore Protocol Security</a>
+                    </div>
+                </div>
+
+                <!-- Port Scanning Simulation -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-warning">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4>Port Scanning</h4>
+                        <span class="module-badge">NET-SCAN-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Open ports reveal attack surfaces and services.</p>
+                        <p class="text-muted">Learn TCP/UDP scanning, stealth techniques, and defensive strategies.</p>
+                        <a href="{{ url_for('port_scanner.index') }}" class="btn btn-outline-warning btn-sm">Explore Port Scanning</a>
+                    </div>
+                </div>
+
+                <!-- DNS Security -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-info">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4>DNS Security</h4>
+                        <span class="module-badge">NET-DNS-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> DNS poisoning and tunneling bypass security controls.</p>
+                        <p class="text-muted">Explore DNS cache poisoning, tunneling, DoH/DoT, and DNSSEC protection.</p>
+                        <a href="{{ url_for('dns_security.index') }}" class="btn btn-outline-info btn-sm">Explore DNS Security</a>
+                    </div>
+                </div>
+
+                <!-- Traffic Analysis -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-primary">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Traffic Analysis</h4>
+                        <span class="module-badge">NET-TRAFFIC-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Unmonitored networks hide malicious activities.</p>
+                        <p class="text-muted">Learn packet capture, anomaly detection, and network forensics.</p>
+                        <a href="{{ url_for('traffic_analysis.index') }}" class="btn btn-outline-primary btn-sm">Explore Traffic Analysis</a>
+                    </div>
+                </div>
+
+                <!-- Firewall Simulation -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-success">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Firewall Rules</h4>
+                        <span class="module-badge">NET-FIREWALL-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Misconfigured firewalls allow unauthorized access.</p>
+                        <p class="text-muted">Configure rules, test traffic, analyze conflicts, and learn best practices.</p>
+                        <a href="{{ url_for('firewall_sim.index') }}" class="btn btn-outline-success btn-sm">Explore Firewall Rules</a>
+                    </div>
+                </div>
+
+                <!-- Coming Soon Module -->
+                <div class="module-card coming-soon">
+                    <div class="module-header">
+                        <div class="module-icon bg-secondary">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <h4>Wireless Security</h4>
+                        <span class="module-badge">Advanced Module</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Insecure wireless networks expose data and access.</p>
+                        <p class="text-muted">WPA/WPA2 attacks, rogue access points, and wireless security best practices.</p>
+                        <span class="badge bg-warning text-dark">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Security Section -->
+        <section id="modules" class="section">
+            <div class="section-header">
+                <h3 class="section-title"><i class="fas fa-globe text-danger me-2"></i>Web Security Phase</h3>
+                <p class="section-subtitle">Advanced web application security vulnerabilities and professional-grade demonstrations</p>
+            </div>
+
+            <div class="modules-grid">
+                <!-- A01: Broken Access Control -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-danger">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h4>A01: Broken Access Control</h4>
+                        <span class="module-badge">WEB-ACCESS-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Users can access unauthorized functionality or data.</p>
+                        <p class="text-muted">Includes privilege escalation, unauthorized access to resources, and bypassing access controls.</p>
+                        <a href="{{ url_for('access_control.index') }}" class="btn btn-outline-danger btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A02: Cryptographic Failures -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-warning">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h4>A02: Cryptographic Failures</h4>
+                        <span class="module-badge">WEB-CRYPTO-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Weak cryptography leads to data exposure.</p>
+                        <p class="text-muted">Covers weak hashing, poor encryption, hardcoded keys, and insecure key management.</p>
+                        <a href="{{ url_for('crypto.index') }}" class="btn btn-outline-warning btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A03: Injection (SQL) -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-danger">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h4>A03: SQL Injection</h4>
+                        <span class="module-badge">WEB-SQL-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Untrusted SQL data sent to interpreter without validation.</p>
+                        <p class="text-muted">Learn SQL injection techniques and prevention methods.</p>
+                        <a href="{{ url_for('sql_injection.index') }}" class="btn btn-outline-danger btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A03: Injection (XSS) -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-danger">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4>A03: Cross-Site Scripting</h4>
+                        <span class="module-badge">WEB-XSS-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Malicious scripts executed in user browsers.</p>
+                        <p class="text-muted">Understand XSS types and effective prevention strategies.</p>
+                        <a href="{{ url_for('xss.index') }}" class="btn btn-outline-danger btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A04: Insecure Design (CSRF) -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-info">
+                            <i class="fas fa-drafting-compass"></i>
+                        </div>
+                        <h4>A04: Insecure Design (CSRF)</h4>
+                        <span class="module-badge">WEB-CSRF-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Flaws in design and architecture lead to security weaknesses.</p>
+                        <p class="text-muted">Demonstrated through CSRF attacks showing poor design decisions.</p>
+                        <a href="{{ url_for('csrf.index') }}" class="btn btn-outline-info btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A05: Security Misconfiguration -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-secondary">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h4>A05: Security Misconfiguration</h4>
+                        <span class="module-badge">WEB-CONFIG-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Improperly configured security settings.</p>
+                        <p class="text-muted">Covers default credentials, unnecessary features, and poor configuration management.</p>
+                        <a href="{{ url_for('security_config.index') }}" class="btn btn-outline-secondary btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A06: Vulnerable Components -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-warning">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <h4>A06: Vulnerable Components</h4>
+                        <span class="module-badge">WEB-VULN-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Using components with known vulnerabilities.</p>
+                        <p class="text-muted">Demonstrates outdated libraries, insecure deserialization, and dependency management.</p>
+                        <a href="{{ url_for('vulnerable_components.index') }}" class="btn btn-outline-warning btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A07: Authentication Failures -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-dark">
+                            <i class="fas fa-user-lock"></i>
+                        </div>
+                        <h4>A07: Authentication Failures</h4>
+                        <span class="module-badge">WEB-AUTH-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Compromised user identity and session management.</p>
+                        <p class="text-muted">Includes weak passwords, session fixation, and poor credential recovery.</p>
+                        <a href="{{ url_for('auth.index') }}" class="btn btn-outline-dark btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A08: Data Integrity Failures -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-danger">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h4>A08: Data Integrity Failures</h4>
+                        <span class="module-badge">WEB-UPLOAD-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Code and infrastructure without integrity verification.</p>
+                        <p class="text-muted">Demonstrated through insecure file uploads and lack of integrity checks.</p>
+                        <a href="{{ url_for('file_upload.index') }}" class="btn btn-outline-danger btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A09: Logging & Monitoring Failures -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-info">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h4>A09: Logging & Monitoring</h4>
+                        <span class="module-badge">WEB-LOG-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Breaches go undetected due to poor monitoring.</p>
+                        <p class="text-muted">Shows insufficient logging, monitoring, and incident response capabilities.</p>
+                        <a href="{{ url_for('logging_monitoring.index') }}" class="btn btn-outline-info btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- A10: Server-Side Request Forgery -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-success">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4>A10: Server-Side Request Forgery</h4>
+                        <span class="module-badge">WEB-SSRF-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Server fetches remote resources without validation.</p>
+                        <p class="text-muted">Demonstrates how attackers can abuse server functionality to access internal resources.</p>
+                        <a href="{{ url_for('ssrf.index') }}" class="btn btn-outline-success btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+
+                <!-- Additional: Data Exposure -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon bg-primary">
+                            <i class="fas fa-eye-slash"></i>
+                        </div>
+                        <h4>Additional: Data Exposure</h4>
+                        <span class="module-badge">WEB-DATA-01</span>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>Risk:</strong> Sensitive data exposed through poor implementation.</p>
+                        <p class="text-muted">Educational demonstration of data exposure patterns and prevention techniques.</p>
+                        <a href="{{ url_for('data_exposure.index') }}" class="btn btn-outline-primary btn-sm">Explore Demo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

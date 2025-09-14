@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}XSS - Secure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE VERSION - XSS Protected</h4>
+            <p class="mb-0">This version sanitizes input using bleach library to prevent XSS attacks.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Comment System (Protected)</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Post a comment:</label>
+                        <textarea class="form-control" name="comment" rows="3" placeholder="Enter your comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+
+                <hr>
+
+                <h6>Comments:</h6>
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment[1] }}</strong>
+                                <small class="text-muted">{{ comment[2] }}</small>
+                            </div>
+                            <!-- SECURE: Sanitized output (bleach already applied server-side) -->
+                            <div class="mt-2">{{ comment[0] | safe }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Secure Code:</h6>
+                <div class="code-block">
+                    <code>
+comment = bleach.clean(comment, tags=['b', 'i', 'em', 'strong'], strip=True)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Protection Methods:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Input sanitization</li>
+                    <li><i class="fas fa-check text-success"></i> HTML tag filtering</li>
+                    <li><i class="fas fa-check text-success"></i> Script tag removal</li>
+                    <li><i class="fas fa-check text-success"></i> Event handler blocking</li>
+                </ul>
+
+                <h6 class="mt-3">Test Previous Payloads:</h6>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<script>alert('Basic XSS!');</script>">
+                        <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code><br>
+                        <small class="text-muted">Stripped out</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<img src=x onerror=alert('Image XSS')>">
+                        <code>&lt;img src=x onerror=alert('XSS')&gt;</code><br>
+                        <small class="text-muted">Event handlers removed</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setPayload(this.dataset.payload)" data-payload="<b>Safe formatting</b> with <i>allowed tags</i>">
+                        <code>&lt;b&gt;Safe&lt;/b&gt; &lt;i&gt;formatting&lt;/i&gt;</code><br>
+                        <small class="text-muted">Allowed tags preserved</small>
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('xss.insecure') }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPayload(payload) {
+    document.querySelector('textarea[name="comment"]').value = payload;
+}
+</script>
+{% endblock %}

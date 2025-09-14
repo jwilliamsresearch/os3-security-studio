@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}Firewall Testing - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-vial text-primary"></i> Firewall Rule Testing</h2>
+                    <p class="text-muted">Test network traffic against configured firewall rules</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('firewall_sim.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Firewall
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-play"></i> Traffic Testing Interface
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="traffic-test-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Source IP Address:</label>
+                                    <input type="text" class="form-control" name="source_ip" 
+                                           placeholder="192.168.1.100" value="192.168.1.100">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Source Port:</label>
+                                    <input type="number" class="form-control" name="source_port" 
+                                           placeholder="1024" value="1024" min="1" max="65535">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Protocol:</label>
+                                    <select class="form-select" name="protocol">
+                                        <option value="TCP">TCP</option>
+                                        <option value="UDP">UDP</option>
+                                        <option value="ICMP">ICMP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Destination IP Address:</label>
+                                    <input type="text" class="form-control" name="dest_ip" 
+                                           placeholder="10.0.0.1" value="10.0.0.1">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Destination Port:</label>
+                                    <input type="number" class="form-control" name="dest_port" 
+                                           placeholder="80" value="80" min="1" max="65535">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Packet Size (bytes):</label>
+                                    <input type="number" class="form-control" name="packet_size" 
+                                           placeholder="1500" value="1500" min="64" max="9000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Test Description:</label>
+                                    <textarea class="form-control" name="description" rows="2" 
+                                              placeholder="Describe the purpose of this test..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary w-100" onclick="testSinglePacket()">
+                                    <i class="fas fa-play"></i> Test Single Packet
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-warning w-100" onclick="testBurst()">
+                                    <i class="fas fa-bolt"></i> Test Packet Burst
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4" id="test-results" style="display: none;">
+                        <h6>Test Results:</h6>
+                        <div class="bg-light p-3 rounded">
+                            <div id="result-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6>Quick Test Scenarios:</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100 mb-2" onclick="loadScenario('web_traffic')">
+                                    <i class="fas fa-globe"></i> Web Traffic (HTTP)
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100 mb-2" onclick="loadScenario('ssh_access')">
+                                    <i class="fas fa-terminal"></i> SSH Access
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100 mb-2" onclick="loadScenario('ping_test')">
+                                    <i class="fas fa-satellite-dish"></i> ICMP Ping
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-danger w-100 mb-2" onclick="loadScenario('malicious_scan')">
+                                    <i class="fas fa-user-ninja"></i> Port Scan Attack
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-danger w-100 mb-2" onclick="loadScenario('ddos_attempt')">
+                                    <i class="fas fa-bomb"></i> DDoS Attempt
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-warning w-100 mb-2" onclick="loadScenario('large_transfer')">
+                                    <i class="fas fa-download"></i> Large File Transfer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-list"></i> Active Rules</h6>
+                </div>
+                <div class="card-body">
+                    <div class="small" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Action</th>
+                                    <th>Rule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td><span class="badge bg-success">ALLOW</span></td>
+                                    <td>HTTP (80)</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td><span class="badge bg-success">ALLOW</span></td>
+                                    <td>HTTPS (443)</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td><span class="badge bg-danger">DENY</span></td>
+                                    <td>SSH (22)</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td><span class="badge bg-warning">LOG</span></td>
+                                    <td>All Traffic</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-bar"></i> Test Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h5 class="text-success" id="packets-allowed">0</h5>
+                                <small>Allowed</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h5 class="text-danger" id="packets-denied">0</h5>
+                                <small>Denied</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h5 class="text-warning" id="packets-logged">0</h5>
+                                <small>Logged</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h5 class="text-info" id="total-tests">0</h5>
+                                <small>Total Tests</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-history"></i> Recent Tests</h6>
+                </div>
+                <div class="card-body">
+                    <div id="recent-tests" style="max-height: 200px; overflow-y: auto;">
+                        <div class="text-muted small">No tests performed yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Test Recommendations</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Test common services first</li>
+                        <li><i class="fas fa-check text-success"></i> Verify both allow and deny rules</li>
+                        <li><i class="fas fa-check text-success"></i> Test edge cases and ranges</li>
+                        <li><i class="fas fa-check text-success"></i> Simulate real attack scenarios</li>
+                        <li><i class="fas fa-check text-success"></i> Document test results</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-graduation-cap"></i> Testing Best Practices:</h6>
+                <ul class="mb-0">
+                    <li><strong>Comprehensive Testing:</strong> Test all rule types, priorities, and edge cases to ensure proper firewall behavior.</li>
+                    <li><strong>Realistic Scenarios:</strong> Use real-world traffic patterns and attack simulations for meaningful results.</li>
+                    <li><strong>Documentation:</strong> Record test results and configurations for compliance and troubleshooting.</li>
+                    <li><strong>Regular Testing:</strong> Perform testing after any rule changes or system updates.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let testStats = {
+    allowed: 0,
+    denied: 0,
+    logged: 0,
+    total: 0
+};
+
+function testSinglePacket() {
+    const form = document.getElementById('traffic-test-form');
+    const formData = new FormData(form);
+    
+    // Simulate firewall rule processing
+    const result = simulateFirewallTest(formData);
+    
+    displayTestResult(result);
+    updateTestStats(result.action);
+    addToRecentTests(result);
+}
+
+function testBurst() {
+    const form = document.getElementById('traffic-test-form');
+    const formData = new FormData(form);
+    
+    // Simulate burst of 10 packets
+    let results = [];
+    for (let i = 0; i < 10; i++) {
+        const result = simulateFirewallTest(formData);
+        results.push(result);
+        updateTestStats(result.action);
+    }
+    
+    displayBurstResults(results);
+}
+
+function simulateFirewallTest(formData) {
+    const sourceIp = formData.get('source_ip');
+    const destIp = formData.get('dest_ip');
+    const destPort = parseInt(formData.get('dest_port'));
+    const protocol = formData.get('protocol');
+    
+    // Simple rule simulation
+    let action = 'DENY';
+    let rule = 'Default Deny';
+    
+    if (protocol === 'TCP' && (destPort === 80 || destPort === 443)) {
+        action = 'ALLOW';
+        rule = `Allow ${protocol} port ${destPort}`;
+    } else if (protocol === 'ICMP') {
+        action = 'ALLOW';
+        rule = 'Allow ICMP';
+    } else if (destPort === 22) {
+        action = 'DENY';
+        rule = 'Deny SSH';
+    }
+    
+    return {
+        timestamp: new Date().toLocaleTimeString(),
+        sourceIp: sourceIp,
+        destIp: destIp,
+        destPort: destPort,
+        protocol: protocol,
+        action: action,
+        rule: rule,
+        packetSize: formData.get('packet_size')
+    };
+}
+
+function displayTestResult(result) {
+    const resultsDiv = document.getElementById('test-results');
+    const contentDiv = document.getElementById('result-content');
+    
+    const actionColor = result.action === 'ALLOW' ? 'success' : result.action === 'DENY' ? 'danger' : 'warning';
+    
+    contentDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Test Result:</strong> 
+                <span class="badge bg-${actionColor}">${result.action}</span>
+            </div>
+            <div>
+                <strong>Rule:</strong> ${result.rule}
+            </div>
+        </div>
+        <div class="mt-2">
+            <small>
+                <strong>Traffic:</strong> ${result.sourceIp}:${result.protocol} → ${result.destIp}:${result.destPort} 
+                (${result.packetSize} bytes)
+            </small>
+        </div>
+    `;
+    
+    resultsDiv.style.display = 'block';
+}
+
+function displayBurstResults(results) {
+    const allowed = results.filter(r => r.action === 'ALLOW').length;
+    const denied = results.filter(r => r.action === 'DENY').length;
+    const logged = results.filter(r => r.action === 'LOG').length;
+    
+    const resultsDiv = document.getElementById('test-results');
+    const contentDiv = document.getElementById('result-content');
+    
+    contentDiv.innerHTML = `
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h5 class="text-success">${allowed}</h5>
+                <small>Allowed</small>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-danger">${denied}</h5>
+                <small>Denied</small>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-warning">${logged}</h5>
+                <small>Logged</small>
+            </div>
+        </div>
+        <div class="mt-2">
+            <small><strong>Burst Test:</strong> 10 packets sent with current configuration</small>
+        </div>
+    `;
+    
+    resultsDiv.style.display = 'block';
+}
+
+function updateTestStats(action) {
+    testStats.total++;
+    if (action === 'ALLOW') testStats.allowed++;
+    else if (action === 'DENY') testStats.denied++;
+    else if (action === 'LOG') testStats.logged++;
+    
+    document.getElementById('packets-allowed').textContent = testStats.allowed;
+    document.getElementById('packets-denied').textContent = testStats.denied;
+    document.getElementById('packets-logged').textContent = testStats.logged;
+    document.getElementById('total-tests').textContent = testStats.total;
+}
+
+function addToRecentTests(result) {
+    const recentDiv = document.getElementById('recent-tests');
+    const actionColor = result.action === 'ALLOW' ? 'success' : result.action === 'DENY' ? 'danger' : 'warning';
+    
+    const testEntry = document.createElement('div');
+    testEntry.className = 'border-bottom pb-1 mb-1 small';
+    testEntry.innerHTML = `
+        <div class="d-flex justify-content-between">
+            <span>${result.timestamp}</span>
+            <span class="badge bg-${actionColor}">${result.action}</span>
+        </div>
+        <div class="text-muted">${result.destIp}:${result.destPort} (${result.protocol})</div>
+    `;
+    
+    if (recentDiv.firstChild && recentDiv.firstChild.textContent.includes('No tests')) {
+        recentDiv.innerHTML = '';
+    }
+    
+    recentDiv.insertBefore(testEntry, recentDiv.firstChild);
+    
+    // Keep only last 5 tests
+    while (recentDiv.children.length > 5) {
+        recentDiv.removeChild(recentDiv.lastChild);
+    }
+}
+
+function loadScenario(scenario) {
+    const form = document.getElementById('traffic-test-form');
+    
+    switch(scenario) {
+        case 'web_traffic':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '93.184.216.34';
+            form.dest_port.value = '80';
+            form.protocol.value = 'TCP';
+            form.description.value = 'Testing HTTP web traffic access';
+            break;
+        case 'ssh_access':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '10.0.0.1';
+            form.dest_port.value = '22';
+            form.protocol.value = 'TCP';
+            form.description.value = 'Testing SSH administrative access';
+            break;
+        case 'ping_test':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '8.8.8.8';
+            form.dest_port.value = '0';
+            form.protocol.value = 'ICMP';
+            form.description.value = 'Testing ICMP ping connectivity';
+            break;
+        case 'malicious_scan':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '10.0.0.1';
+            form.dest_port.value = '23';
+            form.protocol.value = 'TCP';
+            form.description.value = 'Simulating malicious port scan attempt';
+            break;
+        case 'ddos_attempt':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '10.0.0.1';
+            form.dest_port.value = '80';
+            form.protocol.value = 'TCP';
+            form.description.value = 'Simulating DDoS attack traffic';
+            break;
+        case 'large_transfer':
+            form.source_ip.value = '192.168.1.100';
+            form.dest_ip.value = '10.0.0.1';
+            form.dest_port.value = '443';
+            form.protocol.value = 'TCP';
+            form.packet_size.value = '8192';
+            form.description.value = 'Testing large file transfer';
+            break;
+    }
+}
+</script>
+{% endblock %}

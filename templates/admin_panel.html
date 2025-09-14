@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - OS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-primary">
+            <h4><i class="fas fa-crown"></i> Admin Panel</h4>
+            <p class="mb-0">This panel is only accessible by admin users. Access control is properly enforced.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> User Management</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[0] }}</td>
+                        <td>
+                            <strong>{{ user[1] }}</strong>
+                            {% if user[3] == 'admin' %}
+                            <span class="badge bg-danger">Admin</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user[2] }}</td>
+                        <td>
+                            <span class="badge {% if user[3] == 'admin' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ user[3] }}
+                            </span>
+                        </td>
+                        <td>${{ "%.2f"|format(user[4]) }}</td>
+                        <td>
+                            <a href="{{ url_for('access_control.insecure', user_id=user[0]) }}" class="btn btn-sm btn-outline-primary">
+                                View Profile
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h6><i class="fas fa-info-circle"></i> Admin Privileges</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> View all user accounts</li>
+                    <li><i class="fas fa-check text-success"></i> Access user profile data</li>
+                    <li><i class="fas fa-check text-success"></i> Monitor account balances</li>
+                    <li><i class="fas fa-check text-success"></i> Administrative oversight</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-shield-alt"></i> Access Control</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">This panel demonstrates proper role-based access control:</p>
+                <ul class="small">
+                    <li>Only users with admin role can access</li>
+                    <li>@admin_required decorator enforces permission</li>
+                    <li>Session validation prevents unauthorized access</li>
+                    <li>Proper privilege separation implemented</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

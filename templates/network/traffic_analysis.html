@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Network Traffic Analysis - OS³{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-chart-line"></i> Network Traffic Analysis</h5>
+<p><strong>What is it?</strong> Network traffic analysis involves monitoring, capturing, and analyzing network communications to detect threats, troubleshoot issues, and understand network behavior.</p>
+
+<h6>Analysis Techniques:</h6>
+<ul>
+    <li><strong>Flow Analysis:</strong> Examining connection patterns and metadata</li>
+    <li><strong>Packet Inspection:</strong> Deep analysis of packet contents</li>
+    <li><strong>Protocol Analysis:</strong> Understanding application-layer protocols</li>
+    <li><strong>Behavioral Analysis:</strong> Detecting anomalies and suspicious patterns</li>
+</ul>
+
+<h6>Detection Capabilities:</h6>
+<ul>
+    <li>DDoS attacks and traffic anomalies</li>
+    <li>Data exfiltration attempts</li>
+    <li>Malware command and control</li>
+    <li>Lateral movement in networks</li>
+    <li>Policy violations and misuse</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-line"></i> Network Traffic Analysis Dashboard</h2>
+        <p class="lead">Monitor and analyze network traffic patterns to detect security threats.</p>
+    </div>
+</div>
+
+<!-- Real-time Statistics -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="totalPackets">0</h4>
+                        <p>Total Packets</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-network-wired fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="suspiciousPackets">0</h4>
+                        <p>Suspicious Events</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="activeConnections">0</h4>
+                        <p>Active Connections</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-link fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="dataTransfer">0 MB</h4>
+                        <p>Data Transferred</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Traffic Visualizations -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie"></i> Protocol Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="protocolChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Top Talkers</h5>
+            </div>
+            <div class="card-body">
+                <div id="topTalkersTable">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin"></i> Loading traffic data...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Traffic Feed -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-stream"></i> Live Traffic Feed</h5>
+                <div>
+                    <button class="btn btn-sm btn-success" id="startCapture">
+                        <i class="fas fa-play"></i> Start Capture
+                    </button>
+                    <button class="btn btn-sm btn-danger" id="stopCapture" disabled>
+                        <i class="fas fa-stop"></i> Stop Capture
+                    </button>
+                    <button class="btn btn-sm btn-warning" id="clearFeed">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover" id="trafficTable">
+                        <thead class="sticky-top bg-light">
+                            <tr>
+                                <th>Time</th>
+                                <th>Source IP</th>
+                                <th>Destination IP</th>
+                                <th>Protocol</th>
+                                <th>Port</th>
+                                <th>Size</th>
+                                <th>Status</th>
+                                <th>Payload</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trafficTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-eye"></i> Packet Capture</h5>
+            </div>
+            <div class="card-body">
+                <p>Start detailed packet capture and analysis session.</p>
+                <a href="{{ url_for('traffic_analysis.start_capture') }}" class="btn btn-info">
+                    <i class="fas fa-download"></i> Start Capture Session
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-search"></i> Anomaly Detection</h5>
+            </div>
+            <div class="card-body">
+                <p>View detected suspicious activities and security events.</p>
+                <a href="{{ url_for('traffic_analysis.suspicious_activity') }}" class="btn btn-warning">
+                    <i class="fas fa-exclamation-triangle"></i> View Suspicious Activity
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-search-plus"></i> Forensics</h5>
+            </div>
+            <div class="card-body">
+                <p>Investigate security incidents using network forensics.</p>
+                <a href="{{ url_for('traffic_analysis.forensics') }}" class="btn btn-danger">
+                    <i class="fas fa-microscope"></i> Start Investigation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+
+<script>
+let captureInterval;
+let protocolChart;
+let isCapturing = false;
+
+// Initialize charts
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProtocolChart();
+    updateStatistics();
+    
+    // Set up event listeners
+    document.getElementById('startCapture').addEventListener('click', startCapture);
+    document.getElementById('stopCapture').addEventListener('click', stopCapture);
+    document.getElementById('clearFeed').addEventListener('click', clearFeed);
+});
+
+function initializeProtocolChart() {
+    const ctx = document.getElementById('protocolChart').getContext('2d');
+    protocolChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['TCP', 'UDP', 'ICMP'],
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function startCapture() {
+    if (isCapturing) return;
+    
+    isCapturing = true;
+    document.getElementById('startCapture').disabled = true;
+    document.getElementById('stopCapture').disabled = false;
+    
+    // Start fetching live traffic data
+    captureInterval = setInterval(fetchLiveTraffic, 1000);
+    
+    // Update statistics periodically
+    statisticsInterval = setInterval(updateStatistics, 2000);
+}
+
+function stopCapture() {
+    isCapturing = false;
+    document.getElementById('startCapture').disabled = false;
+    document.getElementById('stopCapture').disabled = true;
+    
+    if (captureInterval) {
+        clearInterval(captureInterval);
+    }
+    if (statisticsInterval) {
+        clearInterval(statisticsInterval);
+    }
+}
+
+function clearFeed() {
+    document.getElementById('trafficTableBody').innerHTML = '';
+    
+    // Clear statistics
+    fetch('{{ url_for("traffic_analysis.clear_data") }}')
+        .then(response => response.json())
+        .then(data => {
+            updateStatistics();
+        });
+}
+
+function fetchLiveTraffic() {
+    fetch('{{ url_for("traffic_analysis.get_live_traffic") }}')
+        .then(response => response.json())
+        .then(packets => {
+            const tableBody = document.getElementById('trafficTableBody');
+            
+            packets.forEach(packet => {
+                const row = document.createElement('tr');
+                
+                let statusBadge = '';
+                if (packet.classification === 'suspicious') {
+                    statusBadge = '<span class="badge bg-danger">Suspicious</span>';
+                    row.classList.add('table-warning');
+                } else {
+                    statusBadge = '<span class="badge bg-success">Normal</span>';
+                }
+                
+                row.innerHTML = `
+                    <td><small>${packet.timestamp}</small></td>
+                    <td>${packet.src_ip}:${packet.src_port}</td>
+                    <td>${packet.dst_ip}:${packet.dst_port}</td>
+                    <td><span class="badge bg-secondary">${packet.protocol}</span></td>
+                    <td>${packet.dst_port}</td>
+                    <td>${packet.size}B</td>
+                    <td>${statusBadge}</td>
+                    <td><small><code>${packet.payload}</code></small></td>
+                `;
+                
+                tableBody.insertBefore(row, tableBody.firstChild);
+                
+                // Keep only last 50 rows
+                while (tableBody.children.length > 50) {
+                    tableBody.removeChild(tableBody.lastChild);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching live traffic:', error);
+        });
+}
+
+function updateStatistics() {
+    fetch('{{ url_for("traffic_analysis.get_statistics") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Statistics error:', data.error);
+                return;
+            }
+            
+            // Update counters
+            document.getElementById('totalPackets').textContent = data.total_packets;
+            document.getElementById('suspiciousPackets').textContent = data.suspicious_packets;
+            document.getElementById('activeConnections').textContent = Object.keys(data.top_talkers).length;
+            document.getElementById('dataTransfer').textContent = Math.round(data.total_packets * 0.5) + ' KB';
+            
+            // Update protocol chart
+            if (data.protocols && protocolChart) {
+                const protocols = ['TCP', 'UDP', 'ICMP'];
+                const counts = protocols.map(p => data.protocols[p] || 0);
+                
+                protocolChart.data.datasets[0].data = counts;
+                protocolChart.update();
+            }
+            
+            // Update top talkers table
+            updateTopTalkersTable(data.top_talkers);
+        })
+        .catch(error => {
+            console.error('Error fetching statistics:', error);
+        });
+}
+
+function updateTopTalkersTable(topTalkers) {
+    const container = document.getElementById('topTalkersTable');
+    
+    if (!topTalkers || Object.keys(topTalkers).length === 0) {
+        container.innerHTML = '<div class="text-center text-muted">No traffic data available</div>';
+        return;
+    }
+    
+    let html = `
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Packets</th>
+                    <th>Activity</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    Object.entries(topTalkers).slice(0, 8).forEach(([ip, count]) => {
+        const activity = count > 20 ? 'High' : count > 10 ? 'Medium' : 'Low';
+        const badgeClass = count > 20 ? 'bg-danger' : count > 10 ? 'bg-warning' : 'bg-success';
+        
+        html += `
+            <tr>
+                <td>${ip}</td>
+                <td>${count}</td>
+                <td><span class="badge ${badgeClass}">${activity}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+</script>
+{% endblock %}

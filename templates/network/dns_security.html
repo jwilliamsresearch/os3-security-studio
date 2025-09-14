@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}DNS Security - OS³{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-globe"></i> DNS Security</h5>
+<p><strong>What is DNS?</strong> Domain Name System translates human-readable domain names into IP addresses that computers use to identify each other.</p>
+
+<h6>DNS Vulnerabilities:</h6>
+<ul>
+    <li><strong>Cache Poisoning:</strong> Injecting false DNS records into resolver cache</li>
+    <li><strong>DNS Tunneling:</strong> Using DNS queries to exfiltrate data or establish command channels</li>
+    <li><strong>DNS Hijacking:</strong> Redirecting DNS queries to malicious servers</li>
+    <li><strong>Amplification Attacks:</strong> Using DNS servers for DDoS amplification</li>
+</ul>
+
+<h6>Security Measures:</h6>
+<ul>
+    <li><strong>DNSSEC:</strong> Cryptographic signatures for DNS records</li>
+    <li><strong>DNS over HTTPS (DoH):</strong> Encrypted DNS queries over HTTPS</li>
+    <li><strong>DNS over TLS (DoT):</strong> Encrypted DNS queries over TLS</li>
+    <li><strong>DNS Filtering:</strong> Blocking known malicious domains</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-globe"></i> DNS Security Demonstration</h2>
+        <p class="lead">Explore DNS vulnerabilities and learn how to secure DNS communications.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-search"></i> DNS Lookup Tool</h5>
+            </div>
+            <div class="card-body">
+                <form id="dnsLookupForm">
+                    <div class="mb-3">
+                        <label for="domain" class="form-label">Domain Name</label>
+                        <input type="text" class="form-control" id="domain" name="domain" 
+                               value="example.com" placeholder="Enter domain name" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="recordType" class="form-label">Record Type</label>
+                                <select class="form-select" id="recordType" name="record_type">
+                                    <option value="A">A (IPv4)</option>
+                                    <option value="AAAA">AAAA (IPv6)</option>
+                                    <option value="MX">MX (Mail)</option>
+                                    <option value="NS">NS (Name Server)</option>
+                                    <option value="TXT">TXT (Text)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">DNS Type</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="dns_type" id="regularDNS" value="regular" checked>
+                                        <label class="form-check-label" for="regularDNS">Regular DNS</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="dns_type" id="secureDNS" value="secure">
+                                        <label class="form-check-label" for="secureDNS">Secure DNS</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Lookup DNS
+                    </button>
+                </form>
+                
+                <div id="dnsResults" class="mt-3" style="display: none;">
+                    <h6>DNS Lookup Results:</h6>
+                    <div id="resultsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> DNS Process</h5>
+            </div>
+            <div class="card-body">
+                <h6>How DNS Resolution Works:</h6>
+                <ol class="small">
+                    <li><strong>Browser Cache:</strong> Check local browser cache</li>
+                    <li><strong>OS Cache:</strong> Check operating system cache</li>
+                    <li><strong>Router Cache:</strong> Check local router cache</li>
+                    <li><strong>ISP Resolver:</strong> Query ISP's DNS resolver</li>
+                    <li><strong>Root Servers:</strong> Query root DNS servers</li>
+                    <li><strong>TLD Servers:</strong> Query top-level domain servers</li>
+                    <li><strong>Authoritative:</strong> Query authoritative name servers</li>
+                </ol>
+                
+                <div class="alert alert-warning mt-3">
+                    <small><i class="fas fa-exclamation-triangle"></i> Each step in this process can be a potential attack vector!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-virus"></i> DNS Cache Poisoning</h5>
+            </div>
+            <div class="card-body">
+                <p>Demonstrate how attackers can poison DNS caches to redirect traffic to malicious servers.</p>
+                <div class="alert alert-danger">
+                    <small><i class="fas fa-exclamation-triangle"></i> <strong>Attack Vector:</strong> Inject false DNS records into resolver cache</small>
+                </div>
+                <a href="{{ url_for('dns_security.poisoning_demo') }}" class="btn btn-danger">
+                    <i class="fas fa-flask"></i> Try Cache Poisoning
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-tunnel"></i> DNS Tunneling</h5>
+            </div>
+            <div class="card-body">
+                <p>See how DNS can be abused to create covert communication channels for data exfiltration.</p>
+                <div class="alert alert-warning">
+                    <small><i class="fas fa-eye-slash"></i> <strong>Stealth Factor:</strong> Traffic looks like normal DNS queries</small>
+                </div>
+                <a href="{{ url_for('dns_security.tunneling_demo') }}" class="btn btn-warning">
+                    <i class="fas fa-satellite-dish"></i> Explore Tunneling
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-lock"></i> Secure DNS</h5>
+            </div>
+            <div class="card-body">
+                <p>Learn about DNS security technologies like DoH, DoT, and DNSSEC that protect against attacks.</p>
+                <div class="alert alert-success">
+                    <small><i class="fas fa-shield-alt"></i> <strong>Protection:</strong> Encryption and authentication</small>
+                </div>
+                <a href="{{ url_for('dns_security.secure_dns') }}" class="btn btn-success">
+                    <i class="fas fa-shield-alt"></i> Secure DNS Options
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> DNS Security Comparison</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th class="text-danger">Regular DNS</th>
+                                <th class="text-success">DNS over HTTPS</th>
+                                <th class="text-info">DNS over TLS</th>
+                                <th class="text-warning">DNSSEC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Encryption</strong></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> None</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> HTTPS/TLS</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> TLS</span></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> None</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Authentication</strong></td>
+                                <td><span class="text-danger"><i class="fas fa-times"></i> None</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> Certificate</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> Certificate</span></td>
+                                <td><span class="text-success"><i class="fas fa-check"></i> Digital Signatures</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Privacy</strong></td>
+                                <td><span class="text-danger">Low</span></td>
+                                <td><span class="text-success">High</span></td>
+                                <td><span class="text-success">High</span></td>
+                                <td><span class="text-warning">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td><span class="text-success">Fast</span></td>
+                                <td><span class="text-warning">Moderate</span></td>
+                                <td><span class="text-warning">Moderate</span></td>
+                                <td><span class="text-danger">Slower</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Port</strong></td>
+                                <td>53</td>
+                                <td>443</td>
+                                <td>853</td>
+                                <td>53</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('dnsLookupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const domain = formData.get('domain');
+    const recordType = formData.get('record_type');
+    const dnsType = formData.get('dns_type');
+    const isSecure = dnsType === 'secure';
+    
+    // Show loading
+    const resultsDiv = document.getElementById('dnsResults');
+    const contentDiv = document.getElementById('resultsContent');
+    
+    resultsDiv.style.display = 'block';
+    contentDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Looking up DNS records...</div>';
+    
+    fetch('{{ url_for("dns_security.dns_lookup") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            domain: domain,
+            record_type: recordType,
+            secure: isSecure
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            contentDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            return;
+        }
+        
+        let html = `
+            <div class="card">
+                <div class="card-body">
+                    <h6>Query: ${data.domain} (${data.type})</h6>
+                    <p><strong>Source:</strong> ${data.source}</p>
+                    <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+        `;
+        
+        if (data.poisoned) {
+            html += '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> This record may be poisoned!</div>';
+        }
+        
+        if (data.secure) {
+            html += '<div class="alert alert-success"><i class="fas fa-lock"></i> <strong>Secure:</strong> Query encrypted and authenticated</div>';
+            html += `<p><strong>DNSSEC:</strong> ${data.dnssec ? 'Verified' : 'Not available'}</p>`;
+            html += `<p><strong>Server:</strong> ${data.server}</p>`;
+        }
+        
+        if (data.records && data.records.length > 0) {
+            html += '<h6>Records:</h6><ul>';
+            data.records.forEach(record => {
+                html += `<li><code>${record}</code></li>`;
+            });
+            html += '</ul>';
+        } else {
+            html += '<p class="text-muted">No records found</p>';
+        }
+        
+        html += `<p><strong>TTL:</strong> ${data.ttl || 'N/A'} seconds</p>`;
+        html += '</div></div>';
+        
+        contentDiv.innerHTML = html;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        contentDiv.innerHTML = '<div class="alert alert-danger">An error occurred during DNS lookup</div>';
+    });
+});
+</script>
+{% endblock %}

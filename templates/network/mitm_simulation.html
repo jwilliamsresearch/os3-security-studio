@@ -1,0 +1,704 @@
+{% extends "base.html" %}
+
+{% block title %}Interactive MITM Attack Simulation - OS³{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-user-secret"></i> Interactive Man-in-the-Middle Attack Simulation</h2>
+        <p class="lead">Experience a realistic MITM attack scenario step-by-step. Make choices and see the consequences.</p>
+        
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Educational Simulation:</strong> This is a safe, controlled environment for learning about MITM attacks.
+        </div>
+    </div>
+</div>
+
+<!-- Simulation Control Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-play"></i> Attack Simulation Control</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="mb-3">Choose Your Attack Vector:</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-danger attack-method w-100 p-3" data-method="rogue_wifi">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="fas fa-wifi fa-2x mb-2"></i>
+                                        <strong>Rogue Wi-Fi Hotspot</strong>
+                                        <small class="text-muted">Beginner Level</small>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-warning attack-method w-100 p-3" data-method="arp_spoofing">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="fas fa-network-wired fa-2x mb-2"></i>
+                                        <strong>ARP Spoofing</strong>
+                                        <small class="text-muted">Intermediate Level</small>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-info attack-method w-100 p-3" data-method="dns_spoofing">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="fas fa-globe fa-2x mb-2"></i>
+                                        <strong>DNS Spoofing</strong>
+                                        <small class="text-muted">Intermediate Level</small>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-dark attack-method w-100 p-3" data-method="bgp_hijacking">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="fas fa-route fa-2x mb-2"></i>
+                                        <strong>BGP Hijacking</strong>
+                                        <small class="text-muted">Advanced Level</small>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="attack-status" class="card border-secondary d-none">
+                            <div class="card-header">
+                                <h6>Attack Status</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="success-rate" class="mb-2"></div>
+                                <div id="detection-time" class="mb-2"></div>
+                                <div class="progress mb-2">
+                                    <div id="progress-bar" class="progress-bar" role="progressbar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Network Diagram -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-network-wired"></i> Live Network Topology</h5>
+            </div>
+            <div class="card-body">
+                <div class="network-simulation">
+                    <div class="row align-items-center justify-content-center">
+                        <!-- Victim -->
+                        <div class="col-2 text-center">
+                            <div id="victim-node" class="network-node victim">
+                                <i class="fas fa-laptop fa-3x"></i>
+                                <p><strong>Victim</strong><br><small>192.168.1.100</small></p>
+                                <div class="node-status" id="victim-status">Normal</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Traffic Arrow 1 -->
+                        <div class="col-2 text-center">
+                            <div id="traffic-1" class="traffic-arrow">
+                                <i class="fas fa-arrow-right fa-2x"></i>
+                                <div class="traffic-label">HTTP Request</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Attacker (initially hidden) -->
+                        <div class="col-2 text-center">
+                            <div id="attacker-node" class="network-node attacker d-none">
+                                <i class="fas fa-user-secret fa-3x text-danger"></i>
+                                <p><strong>Attacker</strong><br><small>MITM Position</small></p>
+                                <div class="node-status" id="attacker-status">Listening</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Traffic Arrow 2 -->
+                        <div class="col-2 text-center">
+                            <div id="traffic-2" class="traffic-arrow">
+                                <i class="fas fa-arrow-right fa-2x"></i>
+                                <div class="traffic-label">Forwarded</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Server -->
+                        <div class="col-2 text-center">
+                            <div id="server-node" class="network-node server">
+                                <i class="fas fa-server fa-3x"></i>
+                                <p><strong>Bank Server</strong><br><small>bank-example.com</small></p>
+                                <div class="node-status" id="server-status">Online</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step-by-Step Simulation -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list-ol"></i> Attack Progression</h5>
+            </div>
+            <div class="card-body">
+                <div id="simulation-steps">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Select an attack method above to begin the simulation.
+                    </div>
+                </div>
+                
+                <div id="step-controls" class="mt-3 d-none">
+                    <button id="start-attack" class="btn btn-success me-2">
+                        <i class="fas fa-play"></i> Start Attack
+                    </button>
+                    <button id="next-step" class="btn btn-primary me-2 d-none">
+                        <i class="fas fa-forward"></i> Next Step
+                    </button>
+                    <button id="reset-simulation" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-eye"></i> Intercepted Data</h5>
+            </div>
+            <div class="card-body">
+                <div id="captured-data">
+                    <p class="text-muted">No data captured yet...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-success mt-3">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> How to Prevent</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Always use HTTPS</li>
+                    <li><i class="fas fa-check text-success"></i> Verify SSL certificates</li>
+                    <li><i class="fas fa-check text-success"></i> Use VPN on public networks</li>
+                    <li><i class="fas fa-check text-success"></i> Enable HSTS headers</li>
+                    <li><i class="fas fa-check text-success"></i> Certificate pinning</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('network_protocols.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Protocol Security
+        </a>
+        <a href="{{ url_for('network_protocols.intercepted') }}" class="btn btn-warning">
+            <i class="fas fa-list"></i> View Intercepted Traffic
+        </a>
+    </div>
+</div>
+
+<style>
+.network-simulation {
+    background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%),
+                linear-gradient(-45deg, #f8f9fa 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f8f9fa 75%),
+                linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    padding: 2rem;
+    border-radius: 0.5rem;
+}
+
+.network-node {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.network-node.victim {
+    border: 2px solid #007bff;
+}
+
+.network-node.attacker {
+    border: 2px solid #dc3545;
+    animation: pulse-red 2s infinite;
+}
+
+.network-node.server {
+    border: 2px solid #28a745;
+}
+
+.node-status {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.traffic-arrow {
+    transition: all 0.5s ease;
+}
+
+.traffic-arrow.active {
+    color: #dc3545;
+    animation: flow 1s infinite;
+}
+
+.traffic-label {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+@keyframes flow {
+    0% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(-5px); }
+}
+
+.attack-method:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.step-item {
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}
+
+.step-item.current {
+    border-left-color: #dc3545;
+    background: #fff5f5;
+}
+
+.step-item.completed {
+    border-left-color: #28a745;
+    background: #f0fff4;
+}
+</style>
+
+<script>
+let currentStep = 0;
+let selectedAttack = '';
+let attackInProgress = false;
+
+// Attack method selection
+document.querySelectorAll('.attack-method').forEach(button => {
+    button.addEventListener('click', function() {
+        selectedAttack = this.dataset.method;
+        
+        // Remove previous selections
+        document.querySelectorAll('.attack-method').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Mark this button as active
+        this.classList.add('active');
+        
+        // Show attack status
+        fetch(`/protocol-security/mitm-attack-choice`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({method: selectedAttack})
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('attack-status').classList.remove('d-none');
+            document.getElementById('success-rate').innerHTML = 
+                `<strong>Success Rate:</strong> <span class="badge bg-${data.success_rate > 80 ? 'success' : data.success_rate > 60 ? 'warning' : 'danger'}">${data.success_rate}%</span>`;
+            document.getElementById('detection-time').innerHTML = 
+                `<strong>Detection Time:</strong> ${data.time_to_detect}`;
+            document.getElementById('progress-bar').style.width = data.success_rate + '%';
+            document.getElementById('progress-bar').className = 
+                `progress-bar bg-${data.success_rate > 80 ? 'success' : data.success_rate > 60 ? 'warning' : 'danger'}`;
+            
+            // Show step controls immediately when attack method is selected
+            document.getElementById('step-controls').classList.remove('d-none');
+            
+            // Update simulation steps to show selection
+            document.getElementById('simulation-steps').innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Attack method selected:</strong> ${this.textContent.trim()}
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Click "Start Attack" below to begin the step-by-step simulation.
+                </div>
+            `;
+        });
+    });
+});
+
+// Start simulation
+document.getElementById('start-attack').addEventListener('click', function() {
+    if (!selectedAttack) return;
+    
+    attackInProgress = true;
+    currentStep = 1;
+    
+    // Hide start button and show next step button
+    this.classList.add('d-none');
+    document.getElementById('next-step').classList.remove('d-none');
+    
+    // Show attacker node
+    document.getElementById('attacker-node').classList.remove('d-none');
+    
+    // Activate traffic flow
+    document.querySelectorAll('.traffic-arrow').forEach(arrow => {
+        arrow.classList.add('active');
+    });
+    
+    // Load first step
+    loadStep(1);
+});
+
+// Next step functionality
+document.getElementById('next-step').addEventListener('click', function() {
+    if (currentStep < 5) {
+        currentStep++;
+        loadStep(currentStep);
+    }
+});
+
+// Reset simulation
+document.getElementById('reset-simulation').addEventListener('click', function() {
+    currentStep = 0;
+    attackInProgress = false;
+    selectedAttack = '';
+    
+    // Hide attacker node
+    document.getElementById('attacker-node').classList.add('d-none');
+    
+    // Deactivate traffic flow
+    document.querySelectorAll('.traffic-arrow').forEach(arrow => {
+        arrow.classList.remove('active');
+    });
+    
+    // Hide controls and reset button states
+    document.getElementById('step-controls').classList.add('d-none');
+    document.getElementById('attack-status').classList.add('d-none');
+    document.getElementById('start-attack').classList.remove('d-none');
+    document.getElementById('next-step').classList.add('d-none');
+    
+    // Reset buttons
+    document.querySelectorAll('.attack-method').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Reset content
+    document.getElementById('simulation-steps').innerHTML = 
+        '<div class="alert alert-info"><i class="fas fa-info-circle"></i> Select an attack method above to begin the simulation.</div>';
+    document.getElementById('captured-data').innerHTML = '<p class="text-muted">No data captured yet...</p>';
+});
+
+function loadStep(stepNum) {
+    fetch(`/protocol-security/mitm-step/${stepNum}`)
+        .then(response => response.json())
+        .then(data => {
+            const stepHtml = `
+                <div class="step-item current">
+                    <h6><i class="fas fa-play-circle"></i> ${data.title}</h6>
+                    <p>${data.description}</p>
+                    <div class="alert alert-warning">
+                        <strong>Action:</strong> ${data.action}
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Technical:</strong> ${data.technical}
+                    </div>
+                    <div class="alert alert-${stepNum >= 3 ? 'danger' : 'warning'}">
+                        <strong>Status:</strong> ${data.status}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('simulation-steps').innerHTML = stepHtml;
+            
+            // Update captured data
+            if (stepNum >= 3) {
+                const capturedHtml = `
+                    <div class="alert alert-danger">
+                        <h6>Data Compromised:</h6>
+                        <ul class="mb-0">
+                            <li>Username: john_doe</li>
+                            <li>Password: mySecretPass123</li>
+                            <li>Session: abc123xyz789</li>
+                            <li>IP Address: 192.168.1.100</li>
+                        </ul>
+                    </div>
+                `;
+                document.getElementById('captured-data').innerHTML = capturedHtml;
+            }
+            
+            // Update node statuses
+            if (stepNum >= 2) {
+                document.getElementById('victim-status').textContent = 'Compromised';
+                document.getElementById('attacker-status').textContent = 'Active';
+            }
+            if (stepNum >= 4) {
+                document.getElementById('server-status').textContent = 'Breached';
+            }
+            
+            // Hide next button on final step
+            if (!data.next_step) {
+                document.getElementById('next-step').classList.add('d-none');
+            }
+        });
+}
+</script>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-eye"></i> Data at Risk</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Data Type</th>
+                                <th>Risk Level</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Login Credentials</td>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        Critical
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-exclamation-triangle text-danger"></i> Immediate compromise
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Session Cookies</td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        High
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-exclamation-circle text-warning"></i> Privacy violation
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Personal Information</td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        High
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-exclamation-circle text-warning"></i> Privacy violation
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Financial Data</td>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        Critical
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-exclamation-triangle text-danger"></i> Immediate compromise
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <small><i class="fas fa-info-circle"></i> All this data is transmitted in plain text over HTTP and easily accessible to attackers.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Defense Strategies</h5>
+            </div>
+            <div class="card-body">
+                <h6>Technical Defenses:</h6>
+                <ul>
+                    <li class="mb-1">
+                        <i class="fas fa-check text-success"></i> Always use HTTPS
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-check text-success"></i> Verify SSL certificates
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-check text-success"></i> Use VPN on public networks
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-check text-success"></i> Enable HSTS headers
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-check text-success"></i> Implement certificate pinning
+                    </li>
+                </ul>
+                
+                <h6 class="mt-3">Additional Security Measures:</h6>
+                <ul>
+                    <li><i class="fas fa-check text-success"></i> Multi-factor authentication</li>
+                    <li><i class="fas fa-check text-success"></i> Network monitoring and IDS</li>
+                    <li><i class="fas fa-check text-success"></i> Regular security audits</li>
+                    <li><i class="fas fa-check text-success"></i> Employee security training</li>
+                    <li><i class="fas fa-check text-success"></i> Endpoint detection and response</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-graduation-cap"></i> Real-World Examples</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-wifi"></i> Coffee Shop Attack</h6>
+                        <p><strong>Scenario:</strong> Attacker sets up fake Wi-Fi hotspot "Free_Coffee_WiFi" in a busy café.</p>
+                        <p><strong>Method:</strong> Victims connect to fake network, all traffic routed through attacker's device.</p>
+                        <p><strong>Result:</strong> Banking credentials, emails, and social media accounts compromised.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-globe"></i> DNS Hijacking</h6>
+                        <p><strong>Scenario:</strong> Attacker compromises router or DNS server to redirect legitimate websites.</p>
+                        <p><strong>Method:</strong> DNS responses modified to point to attacker-controlled servers.</p>
+                        <p><strong>Result:</strong> Users unknowingly submit credentials to fake banking sites.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-network-wired"></i> BGP Hijacking</h6>
+                        <p><strong>Scenario:</strong> ISP or nation-state attacker manipulates internet routing protocols.</p>
+                        <p><strong>Method:</strong> Traffic for major websites rerouted through attacker infrastructure.</p>
+                        <p><strong>Result:</strong> Large-scale surveillance and data interception.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tools"></i> Detection Techniques</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Technical Indicators:</h6>
+                        <ul>
+                            <li>Certificate warnings or mismatches</li>
+                            <li>Unexpected network latency or routing changes</li>
+                            <li>Suspicious SSL/TLS cipher suites or protocols</li>
+                            <li>Multiple DHCP servers on the same network</li>
+                            <li>ARP table inconsistencies</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Behavioral Indicators:</h6>
+                        <ul>
+                            <li>Slower than usual internet connections</li>
+                            <li>Unexpected redirects or pop-ups</li>
+                            <li>Sessions being logged out frequently</li>
+                            <li>Unusual account activity notifications</li>
+                            <li>Modified website content or layouts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('network_protocols.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Protocol Demo
+        </a>
+        <a href="{{ url_for('network_protocols.intercepted') }}" class="btn btn-warning">
+            <i class="fas fa-list"></i> View Intercepted Traffic
+        </a>
+    </div>
+</div>
+
+<style>
+.mitm-diagram {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.network-node {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.network-node.client {
+    background-color: #e3f2fd;
+    border: 2px solid #2196f3;
+}
+
+.network-node.attacker {
+    background-color: #ffebee;
+    border: 2px solid #f44336;
+}
+
+.network-node.server {
+    background-color: #e8f5e8;
+    border: 2px solid #4caf50;
+}
+
+.network-node p {
+    margin-bottom: 0;
+    margin-top: 0.5rem;
+}
+
+.network-node i {
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}

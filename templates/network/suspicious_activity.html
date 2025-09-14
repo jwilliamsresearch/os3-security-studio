@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Suspicious Activity Detection - OS³: Open Source Security Studio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-exclamation-triangle text-warning"></i> Suspicious Network Activity</h2>
+                    <p class="text-muted">Real-time anomaly detection and threat analysis</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('traffic_analysis.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Traffic Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-radar"></i> Active Threat Detection
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>{{ anomalies|length }} anomalies detected</strong> in the last 10 minutes
+                    </div>
+
+                    <h6>Detected Anomalies:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Source</th>
+                                    <th>Severity</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for anomaly in anomalies %}
+                                <tr>
+                                    <td><small>{{ anomaly.timestamp }}</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ anomaly.type_color }}">
+                                            {{ anomaly.type }}
+                                        </span>
+                                    </td>
+                                    <td><code>{{ anomaly.source_ip }}</code></td>
+                                    <td>
+                                        <span class="badge bg-{{ anomaly.severity_color }}">
+                                            {{ anomaly.severity }}
+                                        </span>
+                                    </td>
+                                    <td class="small">{{ anomaly.description }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="investigateAnomaly('{{ anomaly.id }}')">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="mt-3">Traffic Pattern Analysis:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Volume Anomalies:</h6>
+                                    <canvas id="volumeChart" width="300" height="150"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Connection Patterns:</h6>
+                                    <canvas id="connectionChart" width="300" height="150"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Behavioral Indicators:</h6>
+                        <div class="row">
+                            {% for indicator in behavioral_indicators %}
+                            <div class="col-md-4 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">{{ indicator.name }}:</span>
+                                    <span class="badge bg-{{ indicator.status_color }}">
+                                        {{ indicator.status }}
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-{{ indicator.risk_color }}" style="width: {{ indicator.risk_level }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-pie"></i> Threat Classification</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Threat Types:</h6>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>Port Scanning:</span>
+                            <span class="badge bg-warning">{{ threat_stats.port_scanning }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>DDoS Attempts:</span>
+                            <span class="badge bg-danger">{{ threat_stats.ddos_attempts }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>Malware C&C:</span>
+                            <span class="badge bg-dark">{{ threat_stats.malware_cc }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>Data Exfiltration:</span>
+                            <span class="badge bg-info">{{ threat_stats.data_exfil }}</span>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-3">Geographic Distribution:</h6>
+                    <ul class="list-unstyled small">
+                        {% for geo in geographic_threats %}
+                        <li class="d-flex justify-content-between">
+                            <span><i class="fas fa-flag"></i> {{ geo.country }}</span>
+                            <span class="badge bg-secondary">{{ geo.count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Risk Score:</h6>
+                    <div class="text-center">
+                        <div class="display-6 text-{{ risk_assessment.color }}">
+                            {{ risk_assessment.score }}/100
+                        </div>
+                        <small class="text-muted">{{ risk_assessment.level }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-robot"></i> AI Detection Engine</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Machine Learning Models:</h6>
+                    <ul class="list-unstyled small">
+                        {% for model in ml_models %}
+                        <li class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>{{ model.name }}:</span>
+                                <span class="badge bg-{{ model.status_color }}">{{ model.accuracy }}%</span>
+                            </div>
+                            <small class="text-muted">{{ model.description }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h6 class="mt-3">Detection Algorithms:</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="fas fa-brain"></i> Anomaly Detection</li>
+                        <li><i class="fas fa-brain"></i> Pattern Recognition</li>
+                        <li><i class="fas fa-brain"></i> Behavioral Analysis</li>
+                        <li><i class="fas fa-brain"></i> Threat Hunting</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-shield-alt"></i> Mitigation Actions</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Automated Responses:</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-ban text-danger"></i> IP Blacklisting</li>
+                        <li><i class="fas fa-shield text-warning"></i> Rate Limiting</li>
+                        <li><i class="fas fa-disconnect text-info"></i> Connection Dropping</li>
+                        <li><i class="fas fa-bell text-primary"></i> Alert Generation</li>
+                    </ul>
+
+                    <h6 class="mt-3">Manual Actions:</h6>
+                    <div class="btn-group-vertical w-100">
+                        <button class="btn btn-sm btn-outline-danger" onclick="blockThreat()">
+                            <i class="fas fa-ban"></i> Block All Threats
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="quarantineSource()">
+                            <i class="fas fa-isolation"></i> Quarantine Sources
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="investigateThreats()">
+                            <i class="fas fa-search"></i> Deep Investigation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-timeline"></i> Threat Timeline</h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for event in threat_timeline %}
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div class="badge bg-{{ event.severity_color }} p-2">
+                                        {{ event.time }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card border-{{ event.severity_color }}">
+                                    <div class="card-body py-2">
+                                        <h6 class="mb-1">{{ event.title }}</h6>
+                                        <p class="small mb-1">{{ event.description }}</p>
+                                        <small class="text-muted">
+                                            Source: {{ event.source }} | Target: {{ event.target }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-graduation-cap"></i> Educational Notes:</h6>
+                <ul class="mb-0">
+                    <li><strong>Anomaly Detection:</strong> Uses statistical analysis and machine learning to identify deviations from normal network behavior.</li>
+                    <li><strong>Behavioral Analysis:</strong> Monitors patterns of communication, connection timing, and data flow to detect threats.</li>
+                    <li><strong>Threat Intelligence:</strong> Correlates observed activity with known attack patterns and indicators of compromise.</li>
+                    <li><strong>False Positives:</strong> Security systems must balance sensitivity with accuracy to minimize false alarms.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simulate real-time threat detection
+function updateThreatData() {
+    // In a real implementation, this would fetch live threat data
+    console.log('Updating suspicious activity detection...');
+}
+
+function investigateAnomaly(id) {
+    alert('Investigating anomaly ID: ' + id + '\n\nIn a real system, this would open detailed forensic analysis tools.');
+}
+
+function blockThreat() {
+    alert('Blocking all identified threats...\n\nIn a real system, this would implement automatic threat mitigation.');
+}
+
+function quarantineSource() {
+    alert('Quarantining threat sources...\n\nIn a real system, this would isolate suspicious network segments.');
+}
+
+function investigateThreats() {
+    alert('Starting deep investigation...\n\nIn a real system, this would launch comprehensive threat hunting procedures.');
+}
+
+// Update every 3 seconds
+setInterval(updateThreatData, 3000);
+
+// Simulate chart data (in a real implementation, you'd use actual Chart.js)
+console.log('Suspicious activity charts would be rendered here with Chart.js');
+</script>
+{% endblock %}

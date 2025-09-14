@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}SQL Injection Demo - Newman Cyber Lab{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-database"></i> SQL Injection</h5>
+<p><strong>What is it?</strong> SQL injection occurs when user input is directly concatenated into SQL queries without proper validation or parameterization.</p>
+
+<h6>Common Attack Vectors:</h6>
+<ul>
+    <li><code>' OR '1'='1</code> - Always true condition</li>
+    <li><code>' UNION SELECT username, password_hash FROM users--</code> - Union-based attack</li>
+    <li><code>'; DROP TABLE users;--</code> - Destructive attack</li>
+</ul>
+
+<h6>Prevention:</h6>
+<ul>
+    <li>Use parameterized queries/prepared statements</li>
+    <li>Input validation and sanitization</li>
+    <li>Principle of least privilege for database accounts</li>
+    <li>Web Application Firewalls (WAF)</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-database"></i> SQL Injection Demonstration</h2>
+        <p class="lead">Compare how the same functionality can be implemented securely vs insecurely.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Insecure Version</h5>
+            </div>
+            <div class="card-body">
+                <p>This version is vulnerable to SQL injection attacks due to direct string concatenation.</p>
+                <div class="code-block">
+                    <code>sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"</code>
+                </div>
+                <a href="{{ url_for('sql_injection_insecure') }}" class="btn btn-danger">Try Insecure Version</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shield-alt"></i> Secure Version</h5>
+            </div>
+            <div class="card-body">
+                <p>This version uses parameterized queries to prevent SQL injection attacks.</p>
+                <div class="code-block">
+                    <code>cursor.execute("SELECT * FROM users WHERE username LIKE ?", (f'%{query}%',))</code>
+                </div>
+                <a href="{{ url_for('sql_injection_secure') }}" class="btn btn-success">Try Secure Version</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-lightbulb"></i> Test Payloads</h5>
+    <p>Try these payloads in the insecure version to see SQL injection in action:</p>
+    <ul class="mb-0">
+        <li><code>' OR '1'='1</code> - Returns all users</li>
+        <li><code>' UNION SELECT username, password_hash, email FROM users--</code> - Extract password hashes</li>
+        <li><code>admin'--</code> - Comment out rest of query</li>
+    </ul>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Learning Objectives</h5>
+    <ul class="mb-0">
+        <li>Understand how SQL injection vulnerabilities occur</li>
+        <li>Learn to identify vulnerable code patterns</li>
+        <li>Practice secure coding with parameterized queries</li>
+        <li>Recognize the impact of successful SQL injection attacks</li>
+    </ul>
+</div>
+{% endblock %}

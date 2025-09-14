@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Insecure Cryptography - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-exclamation-triangle text-danger"></i> Insecure Cryptography</h5>
+<p><strong>Security Risk:</strong> This page demonstrates weak cryptographic practices that can be easily exploited by attackers.</p>
+
+<h6>Vulnerabilities Shown:</h6>
+<ul>
+    <li><strong>MD5 Hashing:</strong> Fast but weak, vulnerable to rainbow tables</li>
+    <li><strong>Hardcoded Keys:</strong> Encryption keys stored in source code</li>
+    <li><strong>No Salt:</strong> Password hashes without random salt</li>
+    <li><strong>Weak Encryption:</strong> Simple XOR cipher</li>
+</ul>
+
+<h6>Attack Vectors:</h6>
+<ul>
+    <li>Rainbow table attacks on MD5 hashes</li>
+    <li>Brute force attacks on weak passwords</li>
+    <li>Key extraction from source code</li>
+    <li>Pattern analysis on XOR encryption</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> Warning: Insecure Cryptography</h4>
+            <p>This demonstration uses <strong>intentionally weak</strong> cryptographic practices. Never use these methods in production!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-hashtag"></i> Weak Password Hashing</h5>
+            </div>
+            <div class="card-body">
+                <p>Using MD5 without salt - easily crackable with rainbow tables:</p>
+                <form id="weakHashForm">
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="weakPassword" placeholder="Enter password" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Generate Weak Hash</button>
+                </form>
+                <div id="weakHashResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Code:</strong><br>
+                        <code>md5_hash = hashlib.md5(password.encode()).hexdigest()</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-lock"></i> Weak Encryption</h5>
+            </div>
+            <div class="card-body">
+                <p>Using hardcoded key with simple XOR cipher:</p>
+                <form id="weakEncryptForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="weakData" placeholder="Enter data to encrypt" value="Secret credit card: 4532-1234-5678-9012">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Encrypt with Weak Method</button>
+                </form>
+                <div id="weakEncryptResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Code:</strong><br>
+                        <code>key = "hardcoded_key"<br>
+                        encrypted = xor_encrypt(data, key)</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-bug"></i> Vulnerability Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div id="vulnerabilityAnalysis"></div>
+                
+                <h6 class="mt-4">How to Exploit:</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>MD5 Hash Cracking:</strong></p>
+                        <ol>
+                            <li>Copy the MD5 hash from above</li>
+                            <li>Use online MD5 crackers or rainbow tables</li>
+                            <li>Common passwords crack instantly</li>
+                            <li>Example: <code>5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8</code> = "password"</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>XOR Cipher Breaking:</strong></p>
+                        <ol>
+                            <li>Analyze the encrypted output patterns</li>
+                            <li>Try common key lengths (8, 16, 32 chars)</li>
+                            <li>Use frequency analysis</li>
+                            <li>Brute force short keys</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('crypto.secure') }}" class="btn btn-success btn-lg">
+            <i class="fas fa-shield-alt"></i> See Secure Implementation
+        </a>
+        <a href="{{ url_for('crypto.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+document.getElementById('weakHashForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const password = document.getElementById('weakPassword').value;
+    
+    fetch('/crypto/weak_hash', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('weakHashResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <h6>MD5 Hash Result:</h6>
+                <p class="font-monospace">${data.hash}</p>
+                <small class="text-muted">
+                    <strong>Why this is bad:</strong> MD5 is fast, no salt, vulnerable to rainbow tables.
+                    This hash can be cracked in seconds using online tools.
+                </small>
+            </div>
+        `;
+        
+        updateVulnerabilityAnalysis(data.hash, null);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('weakHashResult').innerHTML = 
+            '<div class="alert alert-danger">Error generating hash</div>';
+    });
+});
+
+document.getElementById('weakEncryptForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const data = document.getElementById('weakData').value;
+    
+    fetch('/crypto/weak_encrypt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({data: data})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('weakEncryptResult');
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <h6>XOR Encrypted Result:</h6>
+                <p class="font-monospace">${data.encrypted}</p>
+                <p><strong>Key used:</strong> <code>${data.key}</code></p>
+                <small class="text-muted">
+                    <strong>Why this is bad:</strong> Hardcoded key in source code, XOR is easily reversible,
+                    no proper authentication or integrity protection.
+                </small>
+            </div>
+        `;
+        
+        updateVulnerabilityAnalysis(null, data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('weakEncryptResult').innerHTML = 
+            '<div class="alert alert-danger">Error encrypting data</div>';
+    });
+});
+
+function updateVulnerabilityAnalysis(hash, encryption) {
+    const analysisDiv = document.getElementById('vulnerabilityAnalysis');
+    let content = '<h6>Current Vulnerabilities Demonstrated:</h6><ul>';
+    
+    if (hash) {
+        content += `
+            <li><strong>Weak Hash:</strong> MD5 hash <code>${hash}</code> can be cracked using:
+                <ul>
+                    <li>Online MD5 crackers (try: crackstation.net)</li>
+                    <li>Rainbow tables</li>
+                    <li>Dictionary attacks</li>
+                </ul>
+            </li>
+        `;
+    }
+    
+    if (encryption) {
+        content += `
+            <li><strong>Weak Encryption:</strong> XOR cipher with hardcoded key:
+                <ul>
+                    <li>Key visible in source code: <code>${encryption.key}</code></li>
+                    <li>XOR is easily reversible</li>
+                    <li>No authentication or integrity protection</li>
+                </ul>
+            </li>
+        `;
+    }
+    
+    content += '</ul>';
+    analysisDiv.innerHTML = content;
+}
+</script>
+{% endblock %}

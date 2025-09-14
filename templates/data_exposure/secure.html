@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Data Exposure - Secure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE VERSION - Data Protected</h4>
+            <p class="mb-0">This version only exposes necessary data and protects sensitive information.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-users"></i> User Directory (Data Protected)</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-success"><strong>SECURE:</strong> Only public, non-sensitive information is displayed.</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Member Since</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user[0] }}</td>
+                                <td>{{ user[1] }}</td>
+                                <td>
+                                    <small class="text-muted">Public member</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-success mt-3">
+                    <h6><i class="fas fa-shield-alt"></i> Data Protection Applied!</h6>
+                    <p class="mb-0">Sensitive information is properly protected:</p>
+                    <ul class="mt-2 mb-0">
+                        <li>Password hashes are never exposed</li>
+                        <li>Only public profile data is shown</li>
+                        <li>Data minimization principle applied</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Secure Code:</h6>
+                <div class="code-block">
+                    <code>
+cursor.execute('SELECT username, email FROM users')<br>
+users = cursor.fetchall()<br>
+return render_template('users.html', users=users)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Protection Methods:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Data minimization</li>
+                    <li><i class="fas fa-check text-success"></i> Sensitive field exclusion</li>
+                    <li><i class="fas fa-check text-success"></i> Query filtering</li>
+                    <li><i class="fas fa-check text-success"></i> Access control</li>
+                </ul>
+
+                <h6 class="mt-3">Hidden Sensitive Data:</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span>Password Hashes</span>
+                        <small class="text-success">✓ Hidden</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span>Internal User IDs</span>
+                        <small class="text-success">✓ Hidden</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span>Account Balances</span>
+                        <small class="text-success">✓ Hidden</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span>Creation Timestamps</span>
+                        <small class="text-success">✓ Hidden</small>
+                    </div>
+                </div>
+
+                <h6 class="mt-3">Security Principles:</h6>
+                <ul class="small">
+                    <li><strong>Data Minimization:</strong> Only collect/display necessary data</li>
+                    <li><strong>Need-to-Know:</strong> Users only see what they need</li>
+                    <li><strong>Defense in Depth:</strong> Multiple layers of protection</li>
+                    <li><strong>Privacy by Design:</strong> Built-in data protection</li>
+                </ul>
+
+                <h6 class="mt-3">Database Security:</h6>
+                <div class="code-block">
+                    <small>
+                        <code>
+# Password hashes stored securely<br>
+password_hash = generate_password_hash(password)<br>
+# Never included in public queries<br>
+SELECT username, email FROM users  # ✓<br>
+# NOT: SELECT * FROM users  # ❌
+                        </code>
+                    </small>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('data_exposure.insecure') }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

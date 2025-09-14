@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}SSRF Secure Demo - OS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-shield-alt text-success"></i> SSRF - Secure URL Fetcher</h2>
+        <div class="alert alert-success">
+            <strong>✅ SECURE:</strong> This version validates URLs and blocks access to private networks.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Secure URL Fetcher Tool</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="urlInput" class="form-label">Enter URL to fetch:</label>
+                    <input type="text" class="form-control" id="urlInput" placeholder="http://httpbin.org/ip" value="http://httpbin.org/ip">
+                    <div class="form-text">Only whitelisted domains are allowed</div>
+                </div>
+                <button type="button" class="btn btn-success" onclick="fetchUrl()">
+                    <i class="fas fa-download"></i> Fetch URL Securely
+                </button>
+                <button type="button" class="btn btn-secondary ms-2" onclick="clearResponse()">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="card mt-3" id="responseCard" style="display: none;">
+            <div class="card-header">
+                <h5>Server Response</h5>
+            </div>
+            <div class="card-body">
+                <div id="responseContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Controls</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Protections:</strong></p>
+                <ul class="small">
+                    <li>✅ Domain whitelist</li>
+                    <li>✅ Block private IPs</li>
+                    <li>✅ Block localhost</li>
+                    <li>✅ Protocol validation</li>
+                    <li>✅ No redirects</li>
+                </ul>
+                
+                <h6 class="mt-3">Secure Code:</h6>
+                <pre class="bg-light p-2 small"><code>if domain in whitelist:
+    if not is_private_ip(url):
+        response = requests.get(url)
+    else:
+        return "Blocked: Private IP"
+else:
+    return "Blocked: Domain not allowed"</code></pre>
+            </div>
+        </div>
+
+        <div class="card border-info mt-3">
+            <div class="card-header bg-info text-white">
+                <h6><i class="fas fa-list"></i> Allowed Domains</h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>httpbin.org</li>
+                    <li>jsonplaceholder.typicode.com</li>
+                    <li>api.github.com</li>
+                    <li>www.example.com</li>
+                </ul>
+                <p class="small text-muted mt-2">Only these domains are allowed for demonstration purposes.</p>
+            </div>
+        </div>
+
+        <div class="card border-warning mt-3">
+            <div class="card-header bg-warning">
+                <h6><i class="fas fa-test-tube"></i> Test URLs</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">Try these URLs:</p>
+                <div class="test-examples">
+                    <button class="btn btn-sm btn-outline-success mb-1" onclick="setUrl('http://httpbin.org/json')">✅ Allowed</button>
+                    <button class="btn btn-sm btn-outline-success mb-1" onclick="setUrl('https://api.github.com/users/octocat')">✅ Allowed</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://127.0.0.1:5000')">❌ Blocked</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="setUrl('http://google.com')">❌ Not Whitelisted</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-danger mt-3">
+            <div class="card-body text-center">
+                <h6>Compare with Insecure Version</h6>
+                <a href="{{ url_for('ssrf.insecure') }}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-exclamation-triangle"></i> View Vulnerable Implementation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setUrl(url) {
+    document.getElementById('urlInput').value = url;
+}
+
+function clearResponse() {
+    document.getElementById('responseCard').style.display = 'none';
+    document.getElementById('responseContent').innerHTML = '';
+}
+
+async function fetchUrl() {
+    const url = document.getElementById('urlInput').value;
+    const responseCard = document.getElementById('responseCard');
+    const responseContent = document.getElementById('responseContent');
+    
+    if (!url) {
+        alert('Please enter a URL');
+        return;
+    }
+    
+    try {
+        responseContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Validating and fetching...</div>';
+        responseCard.style.display = 'block';
+        
+        const response = await fetch('/ssrf/secure/fetch', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            responseContent.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>✅ Validation Passed - Status:</strong> ${data.status_code}
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> ${data.message}
+                </div>
+                <h6>Response Headers:</h6>
+                <pre class="bg-light p-2 small">${JSON.stringify(data.headers, null, 2)}</pre>
+                <h6>Response Content (first 1000 chars):</h6>
+                <pre class="bg-light p-2 small" style="max-height: 300px; overflow-y: auto;">${data.content}</pre>
+            `;
+        } else {
+            responseContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-shield-alt"></i> <strong>Blocked by Security Controls:</strong> ${data.error}
+                </div>
+                <div class="alert alert-info">
+                    <strong>Why was this blocked?</strong>
+                    <ul class="mt-2 mb-0">
+                        <li>The URL may point to a private IP address or localhost</li>
+                        <li>The domain may not be in the allowed whitelist</li>
+                        <li>The protocol may not be HTTP/HTTPS</li>
+                        <li>The URL format may be invalid</li>
+                    </ul>
+                </div>
+            `;
+        }
+    } catch (error) {
+        responseContent.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Network Error:</strong> ${error.message}
+            </div>
+        `;
+    }
+}
+</script>
+{% endblock %}

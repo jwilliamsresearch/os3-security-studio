@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Registration{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE REGISTRATION - Strong Password Policy</h4>
+            <p class="mb-0">This registration enforces strong password requirements to protect user accounts.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Create Account (Secure)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username:</label>
+                                <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" name="password" required>
+                                <div class="form-text text-success">Strong password required!</div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h6><i class="fas fa-shield-alt"></i> Password Requirements</h6>
+                    </div>
+                    <div class="card-body">
+                        <h6>Security Enforced:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Minimum 8 characters</li>
+                            <li><i class="fas fa-check text-success"></i> At least 1 uppercase letter</li>
+                            <li><i class="fas fa-check text-success"></i> At least 1 lowercase letter</li>
+                            <li><i class="fas fa-check text-success"></i> At least 1 number</li>
+                            <li><i class="fas fa-check text-success"></i> At least 1 special character</li>
+                        </ul>
+
+                        <h6 class="mt-3">Try These Strong Passwords:</h6>
+                        <div class="list-group list-group-flush">
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="MyStr0ng!Pass">
+                                <code>MyStr0ng!Pass</code> ✓
+                            </button>
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="Secure#123">
+                                <code>Secure#123</code> ✓
+                            </button>
+                            <button class="list-group-item list-group-item-action" onclick="setPassword(this.dataset.password)" data-password="C0mpl3x$Word">
+                                <code>C0mpl3x$Word</code> ✓
+                            </button>
+                        </div>
+
+                        <h6 class="mt-3">Security Code:</h6>
+                        <div class="code-block">
+                            <small>
+                                <code>
+if len(password) < 8:<br>
+&nbsp;&nbsp;return "Too short"<br>
+if not re.search(r'[A-Z]', password):<br>
+&nbsp;&nbsp;return "Need uppercase"<br>
+if not re.search(r'[!@#$%^&*()]', password):<br>
+&nbsp;&nbsp;return "Need special char"
+                                </code>
+                            </small>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{{ url_for('insecure_register') }}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPassword(password) {
+    document.querySelector('input[name="password"]').value = password;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}CSRF - Secure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> SECURE VERSION - CSRF Protected</h4>
+            <p class="mb-0">This version validates CSRF tokens to prevent forged requests from external sites.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-university"></i> Newman Bank - Money Transfer (Protected)</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6>Account Balance: ${{ "%.2f"|format(balance) }}</h6>
+                </div>
+
+                <form method="POST" action="{{ url_for('csrf.secure_transfer') }}">>
+                    <!-- SECURE: CSRF token included -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    
+                    <div class="mb-3">
+                        <label for="recipient" class="form-label">Recipient Username:</label>
+                        <input type="text" class="form-control" name="recipient" placeholder="Enter recipient username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount ($):</label>
+                        <input type="number" class="form-control" name="amount" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-shield-alt"></i> Send Money (Secure)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6><i class="fas fa-shield-alt"></i> Security Implementation</h6>
+            </div>
+            <div class="card-body">
+                <h6>Secure Code:</h6>
+                <div class="code-block">
+                    <code>
+csrf_token = request.form.get('csrf_token')<br>
+if not validate_csrf_token(csrf_token):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;flash('Invalid CSRF token!')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return redirect(...)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Protection Methods:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> CSRF token validation</li>
+                    <li><i class="fas fa-check text-success"></i> Session-based tokens</li>
+                    <li><i class="fas fa-check text-success"></i> Token uniqueness</li>
+                    <li><i class="fas fa-check text-success"></i> Request authenticity</li>
+                </ul>
+
+                <h6 class="mt-3">Current CSRF Token:</h6>
+                <div class="code-block">
+                    <small><code>{{ csrf_token }}</code></small>
+                </div>
+                <p class="small text-muted">This token is unique to your session and validates the request origin.</p>
+
+                <h6 class="mt-3">Attack Prevention:</h6>
+                <p class="small">External forms cannot forge requests because they don't have access to the CSRF token stored in your session.</p>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('csrf.insecure') }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> See Insecure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

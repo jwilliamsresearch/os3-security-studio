@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Logging - OS{% endblock %}
+
+{% block help_content %}
+<h5><i class="fas fa-shield-alt text-success"></i> Secure Logging</h5>
+<p><strong>Security Implementation:</strong> Comprehensive logging practices that enable threat detection and compliance.</p>
+
+<h6>Security Features:</h6>
+<ul>
+    <li><strong>Security Events:</strong> Authentication, authorization, data access</li>
+    <li><strong>Data Protection:</strong> No sensitive data in logs</li>
+    <li><strong>Rich Context:</strong> User, timestamp, IP, correlation IDs</li>
+    <li><strong>Real-time Monitoring:</strong> Alerts and anomaly detection</li>
+</ul>
+
+<h6>Compliance Benefits:</h6>
+<ul>
+    <li>GDPR audit trails</li>
+    <li>SOX financial controls</li>
+    <li>HIPAA access logging</li>
+    <li>PCI DSS requirements</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <h4><i class="fas fa-shield-alt"></i> Secure Logging Implementation</h4>
+            <p>This demonstration shows <strong>industry-standard</strong> logging practices for security and compliance.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-sign-in-alt"></i> Secure Login Monitoring</h5>
+            </div>
+            <div class="card-body">
+                <p>This login form implements comprehensive security logging:</p>
+                <form id="secureLoginForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="secureUsername" placeholder="Username" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="securePassword" placeholder="Password" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-success">Login (Secure Logging)</button>
+                </form>
+                <div id="secureLoginResult" class="mt-3"></div>
+                
+                <div class="mt-3 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Best Practice:</strong> Comprehensive logging, no sensitive data, real-time monitoring
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-file-alt"></i> Security Log Entries</h5>
+            </div>
+            <div class="card-body">
+                <p>See proper security logging in action:</p>
+                <div id="securityLogs" class="border rounded p-2 bg-light" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.8em;">
+                    <div class="text-muted">Security logs will appear here...</div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-info btn-sm" onclick="clearSecurityLogs()">Clear Logs</button>
+                    <button class="btn btn-outline-success btn-sm" onclick="generateSecurityLogs()">Generate Sample Logs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-warning mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-bell"></i> Security Alerts</h5>
+            </div>
+            <div class="card-body">
+                <p>Real-time security event monitoring:</p>
+                <div id="securityAlerts" class="border rounded p-2 bg-light" style="height: 150px; overflow-y: auto;">
+                    <div class="text-muted">No active alerts</div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-warning btn-sm" onclick="simulateAlert()">Simulate Security Alert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-primary mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-chart-line"></i> Log Analytics</h5>
+            </div>
+            <div class="card-body">
+                <p>Security metrics and trends:</p>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h6 class="text-primary">Login Attempts</h6>
+                        <span class="badge bg-primary" id="loginAttempts">0</span>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-danger">Failed Logins</h6>
+                        <span class="badge bg-danger" id="failedLogins">0</span>
+                    </div>
+                </div>
+                <div class="row text-center mt-2">
+                    <div class="col-6">
+                        <h6 class="text-warning">Alerts</h6>
+                        <span class="badge bg-warning" id="alertCount">0</span>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-info">Events/Min</h6>
+                        <span class="badge bg-info" id="eventsPerMin">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> Security Logging Best Practices</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-eye"></i> Security Events</h6>
+                        <ul class="small">
+                            <li>Authentication attempts</li>
+                            <li>Authorization failures</li>
+                            <li>Privilege escalations</li>
+                            <li>Data access events</li>
+                            <li>Configuration changes</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-lock"></i> Data Protection</h6>
+                        <ul class="small">
+                            <li>Hash sensitive data</li>
+                            <li>Mask PII information</li>
+                            <li>Sanitize log inputs</li>
+                            <li>Secure log storage</li>
+                            <li>Access controls</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-info-circle"></i> Rich Context</h6>
+                        <ul class="small">
+                            <li>Precise timestamps</li>
+                            <li>User identification</li>
+                            <li>Source IP addresses</li>
+                            <li>Correlation IDs</li>
+                            <li>Request details</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><i class="fas fa-bell"></i> Monitoring</h6>
+                        <ul class="small">
+                            <li>Real-time alerts</li>
+                            <li>Anomaly detection</li>
+                            <li>Threshold monitoring</li>
+                            <li>SIEM integration</li>
+                            <li>Incident response</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('logging_monitoring.insecure_logging') }}" class="btn btn-danger btn-lg">
+            <i class="fas fa-exclamation-triangle"></i> Compare with Insecure Logging
+        </a>
+        <a href="{{ url_for('logging_monitoring.index') }}" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+</div>
+
+<script>
+let loginAttemptCount = 0;
+let failedLoginCount = 0;
+let alertCount = 0;
+let eventsPerMin = 0;
+
+document.getElementById('secureLoginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('secureUsername').value;
+    const password = document.getElementById('securePassword').value;
+    
+    loginAttemptCount++;
+    updateMetrics();
+    
+    fetch('/logging_monitoring/secure_login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({username: username, password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('secureLoginResult');
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h6>Authentication Successful:</h6>
+                    <p>${data.message}</p>
+                    <p><strong>Session ID:</strong> ${data.session_id}</p>
+                    <small class="text-muted">All events properly logged with security context</small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>Authentication Failed:</h6>
+                    <p>${data.message}</p>
+                    <p><strong>Reason:</strong> ${data.reason}</p>
+                    <small class="text-muted">Security event logged and monitored</small>
+                </div>
+            `;
+            failedLoginCount++;
+            updateMetrics();
+            
+            // Check for brute force
+            if (failedLoginCount >= 3) {
+                simulateAlert('Multiple failed login attempts detected');
+            }
+        }
+        
+        // Add to security logs
+        addToSecurityLogs(data.log_entry);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('secureLoginResult').innerHTML = 
+            '<div class="alert alert-danger">Error during authentication</div>';
+    });
+});
+
+function addToSecurityLogs(logEntry) {
+    const logsDiv = document.getElementById('securityLogs');
+    const logLine = document.createElement('div');
+    logLine.innerHTML = logEntry;
+    logLine.className = 'border-bottom pb-1 mb-1';
+    logsDiv.appendChild(logLine);
+    logsDiv.scrollTop = logsDiv.scrollHeight;
+    
+    eventsPerMin++;
+    updateMetrics();
+}
+
+function clearSecurityLogs() {
+    document.getElementById('securityLogs').innerHTML = '<div class="text-muted">Security logs cleared...</div>';
+}
+
+function generateSecurityLogs() {
+    const sampleLogs = [
+        '<span class="text-success">[2024-01-15 10:30:15.123] [INFO] [AUTH] User authentication successful | UserID: user123 | IP: 192.168.1.100 | CorrelationID: abc-def-123</span>',
+        '<span class="text-warning">[2024-01-15 10:30:20.456] [WARN] [AUTH] Authentication failed | Username: admin | Reason: Invalid password | IP: 192.168.1.100 | Attempts: 1</span>',
+        '<span class="text-info">[2024-01-15 10:30:25.789] [INFO] [ACCESS] Resource access granted | UserID: user123 | Resource: /api/data | Method: GET | IP: 192.168.1.100</span>',
+        '<span class="text-danger">[2024-01-15 10:30:30.012] [ERROR] [SECURITY] Suspicious activity detected | UserID: user456 | Activity: Multiple failed access attempts | IP: 192.168.1.200</span>',
+        '<span class="text-primary">[2024-01-15 10:30:35.345] [INFO] [AUDIT] User privilege escalation | UserID: admin | Target: user123 | NewRole: admin | AuthorizedBy: system</span>'
+    ];
+    
+    const logsDiv = document.getElementById('securityLogs');
+    logsDiv.innerHTML = '<div class="text-muted">Sample secure logging practices:</div>';
+    
+    sampleLogs.forEach((log, index) => {
+        setTimeout(() => {
+            const logLine = document.createElement('div');
+            logLine.innerHTML = log;
+            logLine.className = 'border-bottom pb-1 mb-1';
+            logsDiv.appendChild(logLine);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }, index * 500);
+    });
+}
+
+function simulateAlert(message = 'Security threshold exceeded') {
+    alertCount++;
+    updateMetrics();
+    
+    const alertsDiv = document.getElementById('securityAlerts');
+    const timestamp = new Date().toLocaleTimeString();
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-sm p-2 mb-1';
+    alertDiv.innerHTML = `
+        <strong>[${timestamp}] SECURITY ALERT:</strong><br>
+        ${message}<br>
+        <small>Auto-response: Increased monitoring activated</small>
+    `;
+    alertsDiv.appendChild(alertDiv);
+    alertsDiv.scrollTop = alertsDiv.scrollHeight;
+}
+
+function updateMetrics() {
+    document.getElementById('loginAttempts').textContent = loginAttemptCount;
+    document.getElementById('failedLogins').textContent = failedLoginCount;
+    document.getElementById('alertCount').textContent = alertCount;
+    document.getElementById('eventsPerMin').textContent = eventsPerMin;
+}
+
+// Simulate real-time metrics updates
+setInterval(() => {
+    if (Math.random() < 0.3) {
+        eventsPerMin++;
+        updateMetrics();
+    }
+}, 2000);
+</script>
+{% endblock %}

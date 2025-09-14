@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Port Scan Defense - Newman Cyber Lab{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Port Scan Defense Module
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Learn how to detect and defend against port scanning attacks using monitoring tools and defensive strategies.
+                    </p>
+                    
+                    <div class="text-center">
+                        <button class="btn btn-success btn-lg" id="toggleMonitoring">
+                            <i class="fas fa-play"></i> Start Defense Monitoring
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Monitoring Dashboard -->
+    <div class="row mt-4" id="monitoringSection" style="display: none;">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Live Defense Monitor
+                        <span class="badge bg-light text-dark ms-2" id="monitoringStatus">Active</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h3 id="connectionsPerSec">12.4</h3>
+                                    <small>Connections/sec</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h3 id="uniqueSources">8</h3>
+                                    <small>Unique IPs</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h3 id="blockedAttempts">1,247</h3>
+                                    <small>Blocked Scans</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h3 id="alertsTriggered">23</h3>
+                                    <small>Alerts Today</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="mt-4">
+                        <h6><i class="fas fa-clock"></i> Recent Blocked Scans</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Attacker IP</th>
+                                        <th>Ports Targeted</th>
+                                        <th>Action Taken</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentScans">
+                                    <tr>
+                                        <td>14:23:45</td>
+                                        <td><code>192.168.1.45</code></td>
+                                        <td>22, 80, 443</td>
+                                        <td><span class="badge bg-danger">Blocked</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:22:12</td>
+                                        <td><code>10.0.0.123</code></td>
+                                        <td>1-1000</td>
+                                        <td><span class="badge bg-danger">Blocked</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Defense Strategy Cards -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-eye"></i> Detection Methods
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Pattern Recognition</strong>
+                                <br><small class="text-muted">Detects rapid sequential port connections</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">95%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Rate Limiting</strong>
+                                <br><small class="text-muted">Blocks too many connections per second</small>
+                            </div>
+                            <span class="badge bg-warning rounded-pill">85%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Threshold Detection</strong>
+                                <br><small class="text-muted">Triggers alerts on suspicious activity</small>
+                            </div>
+                            <span class="badge bg-info rounded-pill">78%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Defense Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ban text-danger me-3"></i>
+                                <div>
+                                    <strong>Automatic IP Blocking</strong>
+                                    <br><small class="text-muted">Block attacking IPs for 24 hours</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-bell text-warning me-3"></i>
+                                <div>
+                                    <strong>Real-time Alerts</strong>
+                                    <br><small class="text-muted">Notify security team immediately</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-history text-info me-3"></i>
+                                <div>
+                                    <strong>Activity Logging</strong>
+                                    <br><small class="text-muted">Record all attempts for analysis</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Test Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-vial"></i> Test Defense System
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Test how well your defenses work against different types of port scans:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <button class="btn btn-outline-primary btn-lg mb-2" id="testFastScan">
+                                <i class="fas fa-bolt"></i><br>Test Fast Scan
+                            </button>
+                            <br><small class="text-muted">Rapid port scanning</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <button class="btn btn-outline-warning btn-lg mb-2" id="testStealthScan">
+                                <i class="fas fa-eye-slash"></i><br>Test Stealth Scan
+                            </button>
+                            <br><small class="text-muted">Slow, sneaky scanning</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <button class="btn btn-outline-danger btn-lg mb-2" id="testDistributedScan">
+                                <i class="fas fa-network-wired"></i><br>Test Distributed
+                            </button>
+                            <br><small class="text-muted">Multiple source IPs</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3" id="testResults" style="display: none;">
+                        <div class="alert">
+                            <div id="testOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let monitoringInterval;
+let isMonitoring = false;
+
+// Main monitoring toggle
+function toggleMonitoring() {
+    if (isMonitoring) {
+        stopMonitoring();
+    } else {
+        startMonitoring();
+    }
+}
+
+function startMonitoring() {
+    isMonitoring = true;
+    document.getElementById('toggleMonitoring').innerHTML = '<i class="fas fa-stop"></i> Stop Monitoring';
+    document.getElementById('toggleMonitoring').className = 'btn btn-danger btn-lg';
+    document.getElementById('monitoringSection').style.display = 'block';
+    
+    // Update data every 3 seconds
+    monitoringInterval = setInterval(updateStats, 3000);
+}
+
+function stopMonitoring() {
+    isMonitoring = false;
+    document.getElementById('toggleMonitoring').innerHTML = '<i class="fas fa-play"></i> Start Defense Monitoring';
+    document.getElementById('toggleMonitoring').className = 'btn btn-success btn-lg';
+    document.getElementById('monitoringSection').style.display = 'none';
+    
+    if (monitoringInterval) {
+        clearInterval(monitoringInterval);
+    }
+}
+
+// Update monitoring statistics
+function updateStats() {
+    // Generate realistic random data
+    document.getElementById('connectionsPerSec').textContent = (Math.random() * 20 + 5).toFixed(1);
+    document.getElementById('uniqueSources').textContent = Math.floor(Math.random() * 15) + 3;
+    document.getElementById('blockedAttempts').textContent = (Math.floor(Math.random() * 1000) + 1000).toLocaleString();
+    document.getElementById('alertsTriggered').textContent = Math.floor(Math.random() * 30) + 10;
+    
+    // Occasionally add a new blocked scan
+    if (Math.random() > 0.7) {
+        addNewScan();
+    }
+}
+
+function addNewScan() {
+    const tbody = document.getElementById('recentScans');
+    const time = new Date().toLocaleTimeString();
+    const ips = ['192.168.1.45', '10.0.0.123', '172.16.1.89', '203.0.113.42'];
+    const ip = ips[Math.floor(Math.random() * ips.length)];
+    const ports = ['22, 80, 443', '1-1000', '21, 22, 23', '80, 443, 8080'];
+    const port = ports[Math.floor(Math.random() * ports.length)];
+    
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>${time}</td>
+        <td><code>${ip}</code></td>
+        <td>${port}</td>
+        <td><span class="badge bg-danger">Blocked</span></td>
+    `;
+    
+    // Highlight new row
+    newRow.style.backgroundColor = '#fff3cd';
+    tbody.insertBefore(newRow, tbody.firstChild);
+    
+    // Remove highlight after 2 seconds
+    setTimeout(() => {
+        newRow.style.backgroundColor = '';
+    }, 2000);
+    
+    // Keep only 5 rows
+    while (tbody.children.length > 5) {
+        tbody.removeChild(tbody.lastChild);
+    }
+}
+
+// Simple test functions
+function testFastScan() {
+    showTestResult('Fast Scan Test', 'Fast scan detected and blocked in 0.3 seconds!', 'success');
+}
+
+function testStealthScan() {
+    showTestResult('Stealth Scan Test', 'Stealth scan detected after 2.1 seconds', 'warning');
+}
+
+function testDistributedScan() {
+    showTestResult('Distributed Scan Test', 'Partial detection - 3 of 5 sources blocked', 'danger');
+}
+
+function showTestResult(title, message, type) {
+    const testResults = document.getElementById('testResults');
+    const testOutput = document.getElementById('testOutput');
+    
+    testResults.style.display = 'block';
+    testOutput.innerHTML = `<strong>${title}:</strong> ${message}`;
+    testResults.className = `alert alert-${type}`;
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        testResults.style.display = 'none';
+    }, 4000);
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('toggleMonitoring').addEventListener('click', toggleMonitoring);
+    document.getElementById('testFastScan').addEventListener('click', testFastScan);
+    document.getElementById('testStealthScan').addEventListener('click', testStealthScan);
+    document.getElementById('testDistributedScan').addEventListener('click', testDistributedScan);
+});
+</script>
+
+{% endblock %}

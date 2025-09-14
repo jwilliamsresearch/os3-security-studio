@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Data Exposure - Insecure Version{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle"></i> INSECURE VERSION - Sensitive Data Exposed</h4>
+            <p class="mb-0">This version exposes password hashes and sensitive internal data!</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-users"></i> User Directory (Data Exposed)</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-danger"><strong>WARNING:</strong> This page exposes sensitive information including password hashes!</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Password Hash</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user[0] }}</td>
+                                <td class="text-danger">
+                                    <code>{{ user[1][:20] }}...</code>
+                                    <small class="d-block">Exposed hash!</small>
+                                </td>
+                                <td>{{ user[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-danger mt-3">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Security Breach!</h6>
+                    <p class="mb-0">Password hashes are visible to anyone who accesses this page. Attackers could:</p>
+                    <ul class="mt-2 mb-0">
+                        <li>Attempt to crack these hashes offline</li>
+                        <li>Use rainbow tables for common passwords</li>
+                        <li>Identify weak passwords through pattern analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6><i class="fas fa-bug"></i> Vulnerability Details</h6>
+            </div>
+            <div class="card-body">
+                <h6>Vulnerable Code:</h6>
+                <div class="code-block">
+                    <code>
+cursor.execute('SELECT username, password_hash, email FROM users')<br>
+users = cursor.fetchall()<br>
+return render_template('users.html', users=users)
+                    </code>
+                </div>
+
+                <h6 class="mt-3">Exposed Data:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger"></i> Password hashes</li>
+                    <li><i class="fas fa-times text-danger"></i> Internal user IDs</li>
+                    <li><i class="fas fa-times text-danger"></i> Complete user data</li>
+                    <li><i class="fas fa-times text-danger"></i> Sensitive metadata</li>
+                </ul>
+
+                <h6 class="mt-3">Attack Scenarios:</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <strong>Hash Cracking</strong><br>
+                        <small class="text-muted">Offline brute force attacks</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Rainbow Tables</strong><br>
+                        <small class="text-muted">Pre-computed hash lookups</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Pattern Analysis</strong><br>
+                        <small class="text-muted">Identify weak password policies</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Credential Stuffing</strong><br>
+                        <small class="text-muted">Use hashes on other services</small>
+                    </div>
+                </div>
+
+                <h6 class="mt-3">Real-World Impact:</h6>
+                <ul class="small">
+                    <li>Account compromise</li>
+                    <li>Identity theft</li>
+                    <li>Privacy violations</li>
+                    <li>Regulatory compliance failures</li>
+                </ul>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('data_exposure.secure') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-shield-alt"></i> See Secure Version
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
